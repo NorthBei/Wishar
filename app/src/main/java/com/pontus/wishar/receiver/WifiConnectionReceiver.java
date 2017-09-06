@@ -11,23 +11,21 @@ import android.util.Log;
 
 import com.pontus.wishar.notify.NotificationCenter;
 import com.pontus.wishar.service.WISPrService;
+import com.pontus.wishar.storage.AccountStorage;
 import com.pontus.wishar.wifi.WifiAdmin;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
 
 import static android.net.wifi.WifiManager.EXTRA_NEW_STATE;
 import static android.net.wifi.WifiManager.SUPPLICANT_STATE_CHANGED_ACTION;
-import static com.pontus.wishar.Constants.EXTRA_LOGIN_ACCOUNT;
-import static com.pontus.wishar.Constants.EXTRA_LOGIN_PASSWORD;
+import static com.pontus.wishar.Constants.WISPR_LOGIN_ACCOUNT;
+import static com.pontus.wishar.Constants.WISPR_LOGIN_PASSWORD;
 
 public class WifiConnectionReceiver extends BroadcastReceiver {
 
     private static final String TAG = WifiConnectionReceiver.class.getSimpleName();
     private static final String EXCEPT_SSID_1 = "<unknown ssid>" , EXCEPT_SSID_2 = "0x";
     public static boolean isConnected = false;
-
-    private Set<String> ssidSet = new HashSet<>();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -55,7 +53,6 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
                 Log.d(TAG, "onReceive: CONNECT SSID:"+SSID);
                 Log.d(TAG, "onReceive: Change isConnected: "+isConnected);
 
-                NotificationCenter.getInstance(context).showNotify("wifi connect to " + SSID);
                 loginWifi(context,SSID);
             }
         }
@@ -71,15 +68,15 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
     }
 
     private void loginWifi(Context context, String SSID) {
-        if(ssidSet.isEmpty()){
-            String[] wifiNames = {"iTaiwan","TPE-Free","TPE-Free_CHT","CHT Wi-Fi(HiNet)"};
-            for (String ssid: wifiNames) {
-                ssidSet.add(ssid);
-            }
+
+        boolean isOurService =  AccountStorage.isAccountExist(context,SSID);
+        Log.d(TAG, "loginWifi: isOurService:"+isOurService);
+        if(isOurService){
+            NotificationCenter.getInstance(context).showNotify("wifi connect to " + SSID);
+            AccountStorage as = new AccountStorage(context,SSID);
+            Map<String,String> loginInfo = as.getLoginInfo();
         }
 
-        boolean isOurService = ssidSet.contains(SSID);
-        Log.d(TAG, "loginWifi: isOurService:"+isOurService);
         if(isOurService){
             String account = null,password = null;
 
@@ -100,8 +97,8 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
             }
 
             Intent loginIntent = new Intent(context, WISPrService.class);
-            loginIntent.putExtra(EXTRA_LOGIN_ACCOUNT,account);
-            loginIntent.putExtra(EXTRA_LOGIN_PASSWORD,password);
+            loginIntent.putExtra(WISPR_LOGIN_ACCOUNT,account);
+            loginIntent.putExtra(WISPR_LOGIN_PASSWORD,password);
 
             context.startService(loginIntent);
             //EzWISPr.login((Activity)context,account,password);

@@ -38,8 +38,8 @@ public class WISPrService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
 
-            String account = intent.getStringExtra(Constants.EXTRA_LOGIN_ACCOUNT);
-            String password = intent.getStringExtra(Constants.EXTRA_LOGIN_PASSWORD);
+            String account = intent.getStringExtra(Constants.WISPR_LOGIN_ACCOUNT);
+            String password = intent.getStringExtra(Constants.WISPR_LOGIN_PASSWORD);
             Log.d(TAG, "onHandleIntent: account:"+account+" password:"+password);
             EzWISPr ez = new EzWISPr();
             ArrayList<String> logResult = ez.loginWithLog(account,password);
