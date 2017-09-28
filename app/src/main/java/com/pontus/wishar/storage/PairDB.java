@@ -3,6 +3,7 @@ package com.pontus.wishar.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.File;
 import java.util.Arrays;
@@ -13,6 +14,8 @@ public class PairDB {
     private static String TAG = PairDB.class.getSimpleName();
     private static PairDB instance;
     private Context context;
+
+    //Tray is an other choice for easy use SharedPreferences https://github.com/grandcentrix/tray
 
     private PairDB(Context context) {
         this.context = context;
@@ -38,6 +41,9 @@ public class PairDB {
             //全部sharedPreferences儲存的file
             String[] list = prefsdir.list();
             List<String> fileList = Arrays.asList(list);
+            for (String s: fileList) {
+                Log.d(TAG, "isTableExist: fileName:"+s);
+            }
             return fileList.contains(fileName);
         }
         return false;
@@ -46,8 +52,10 @@ public class PairDB {
     public class PairTable{
         private SharedPreferences readOnlyTable;
         private SharedPreferences.Editor writeOnlyTable;
+        private String tableName;
 
         public PairTable(Context context,String tableName){
+            this.tableName = tableName;
             readOnlyTable = context.getSharedPreferences(tableName, Context.MODE_PRIVATE);
             writeOnlyTable = readOnlyTable.edit();
         }
@@ -85,6 +93,13 @@ public class PairDB {
 
         public void remove(@NonNull String key){
             writeOnlyTable.remove(key).apply();
+        }
+
+        public void removeTable(){
+            //writeOnlyTable.clear().commit();
+            File table = new File(context.getApplicationInfo().dataDir,"shared_prefs/"+tableName+".xml");
+            if(table.exists())
+                table.delete();
         }
 
     }

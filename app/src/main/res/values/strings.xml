@@ -15,4 +15,10 @@
     <string name="chunghwa">中華漫遊</string>
     <string name="emome">emome帳戶</string>
     <string name="hinet">Hinet帳戶</string>
+
+
+    <string name="edit_dialog_spinner_hint">帳戶類型</string>
+    <string name="edit_dialog_input_limit">0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%+?\*_"'()-:</string>
+
+
 </resources>

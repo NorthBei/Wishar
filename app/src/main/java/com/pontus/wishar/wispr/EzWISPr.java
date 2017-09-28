@@ -229,7 +229,7 @@ public class EzWISPr extends TimerTask {
         return out.toString(m_sCharset);
     }
 
-    public String doGet(String sURL) {
+    public String   doGet(String sURL) {
         log("doGet begin");
         String sRet = null;
         try {

@@ -9,26 +9,26 @@ import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import com.pontus.wishar.Constants;
+import com.pontus.wishar.data.WifiDesc;
 import com.pontus.wishar.notify.NotificationCenter;
-import com.pontus.wishar.service.WISPrService;
+import com.pontus.wishar.service.WISPrLoginService;
+import com.pontus.wishar.service.WebLoginService;
 import com.pontus.wishar.storage.AccountStorage;
+import com.pontus.wishar.storage.AssetsStorage;
 import com.pontus.wishar.wifi.WifiAdmin;
-
-import java.util.Map;
 
 import static android.net.wifi.WifiManager.EXTRA_NEW_STATE;
 import static android.net.wifi.WifiManager.SUPPLICANT_STATE_CHANGED_ACTION;
-import static com.pontus.wishar.Constants.WISPR_LOGIN_ACCOUNT;
-import static com.pontus.wishar.Constants.WISPR_LOGIN_PASSWORD;
 
 public class WifiConnectionReceiver extends BroadcastReceiver {
 
     private static final String TAG = WifiConnectionReceiver.class.getSimpleName();
     private static final String EXCEPT_SSID_1 = "<unknown ssid>" , EXCEPT_SSID_2 = "0x";
-    public static boolean isConnected = false;
+    private static boolean isConnected = false;
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
 
         if (intent.equals(SUPPLICANT_STATE_CHANGED_ACTION)) {
             SupplicantState state =  intent.getParcelableExtra(EXTRA_NEW_STATE);
@@ -40,68 +40,48 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
             return;
         }
 
-        if (isConnectedIntent(intent)) {
-
+        if (!isConnected && isConnectedIntent(intent)) {
+            //如果wifi目前沒連線,而且intent內容是wifi連線成功
             String SSID = WifiAdmin.getInstance(context).getWifiInfo().getSSID().replace("\"", "");
 
+            //wifi可能會在開啟或是關閉的時候出現這兩個value，兩個值都是錯誤的，直接擋掉
             if(SSID.equals(EXCEPT_SSID_1) || SSID.equals(EXCEPT_SSID_2))
                 return;
 
-            if(!isConnected){
-                isConnected = true;
+            isConnected = true;
+            Log.d(TAG, "onReceive: CONNECT SSID:"+SSID+", Change isConnected: "+isConnected);
 
-                Log.d(TAG, "onReceive: CONNECT SSID:"+SSID);
-                Log.d(TAG, "onReceive: Change isConnected: "+isConnected);
+            //判斷是不是Wishar的服務範圍,不是就掰掰
+            boolean isOurService =  AccountStorage.isAccountExist(context,SSID);
+            Log.d(TAG, "loginWifi:"+SSID+", isOurService:"+isOurService);
+            //isOurService = true;
+            if (!isOurService)
+                return;
 
-                loginWifi(context,SSID);
-            }
-        }
-        else if (isDisconnectedIntent(intent)) {
+            //讀描述檔，這邊主要是拿type來判斷要啟動哪一個service
+            AssetsStorage as = new AssetsStorage(context);
+            WifiDesc wifiDesc = as.readFileToJson(SSID+".json", WifiDesc.class);
 
-            if(isConnected){
-                isConnected = false;
-                Log.d(TAG, "onReceive: DISCONNECT");
-                Log.d(TAG, "onReceive: Change isConnected: "+isConnected);
-                NotificationCenter.getInstance(context).cleanNotify();
-            }
-        }
-    }
-
-    private void loginWifi(Context context, String SSID) {
-
-        boolean isOurService =  AccountStorage.isAccountExist(context,SSID);
-        Log.d(TAG, "loginWifi: isOurService:"+isOurService);
-        if(isOurService){
-            NotificationCenter.getInstance(context).showNotify("wifi connect to " + SSID);
-            AccountStorage as = new AccountStorage(context,SSID);
-            Map<String,String> loginInfo = as.getLoginInfo();
-        }
-
-        if(isOurService){
-            String account = null,password = null;
-
-            switch (SSID){
-                case "iTaiwan":
-                    account = "0972102760@itw";
-                    password = "simon054";
+            Class<?> cls = null;
+            switch (wifiDesc.getType()){
+                case WifiDesc.WISPr:{
+                    cls = WISPrLoginService.class;
                     break;
-                case "TPE-Free_CHT":
-                case "TPE-Free":
-                    account ="0972102760@tpe-free.tw";
-                    password = "simon054";
+                }
+                case WifiDesc.WEB_LOGIN:{
+                    cls = WebLoginService.class;
                     break;
-                case "CHT Wi-Fi(HiNet)":
-                    account = "0975777632@emome.net";
-                    password = "GFDB5Dqt";
-                    break;
+                }
             }
-
-            Intent loginIntent = new Intent(context, WISPrService.class);
-            loginIntent.putExtra(WISPR_LOGIN_ACCOUNT,account);
-            loginIntent.putExtra(WISPR_LOGIN_PASSWORD,password);
-
-            context.startService(loginIntent);
-            //EzWISPr.login((Activity)context,account,password);
+            Intent i = new Intent(context, cls);
+            i.putExtra(Constants.EXTRA_LOGIN_SSID,SSID);
+            context.startService(i);
+        }
+        else if (isConnected && isDisconnectedIntent(intent)) {
+            //如果wifi已經連上了,而且intent內容是wifi斷線
+            isConnected = false;
+            Log.d(TAG, "onReceive: DISCONNECT Change isConnected: "+isConnected);
+            NotificationCenter.getInstance(context).cleanNotify();
         }
     }
 

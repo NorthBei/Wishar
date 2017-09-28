@@ -6,18 +6,20 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.pontus.wishar.R;
 import com.pontus.wishar.data.HotSpot;
+import com.pontus.wishar.data.HotSpotOption;
+import com.pontus.wishar.data.WifiDesc;
 import com.pontus.wishar.storage.AccountStorage;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -71,22 +73,27 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
 
         @BindView(R.id.input_account) EditText inputAccount;
         @BindView(R.id.input_password) EditText inputPassword;
-        @BindView(R.id.spinner) Spinner spinner;
+        @BindView(R.id.spinner) MaterialSpinner spinner;
 
-        private View dialogView;
         private Context context;
         private AlertDialog dialog;
         private String SSID;
+        private AccountStorage accountManager;
         private HotSpot wifiHopSpot;
-        private boolean isSpinnerShow = false;
 
         //http://shawnba.blogspot.tw/2013/06/android-positivebutton-alertdialog.html
 
         public AccountInfoDialog(Context context, HotSpot wifiHopSpot) {
             this.context = context;
             this.wifiHopSpot = wifiHopSpot;
+            this.SSID = wifiHopSpot.getSsid();
+            this.accountManager = new AccountStorage(context,SSID);
 
-            dialogView = LayoutInflater.from(context).inflate(R.layout.edit_dialog, null);
+            initDialog();
+        }
+
+        private void initDialog(){
+            View dialogView = LayoutInflater.from(context).inflate(R.layout.edit_dialog, null);
             ButterKnife.bind(this, dialogView);
 
             dialog = new AlertDialog.Builder(context)
@@ -96,16 +103,12 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
                     .setPositiveButton(context.getString(R.string.account_dialog_check_btn), null)
                     .create();
 
-            SSID = wifiHopSpot.getSsid();
-
             showSpinner();
 
             boolean isAccountExist = AccountStorage.isAccountExist(context,SSID);
             if(isAccountExist){
-                AccountStorage as = new AccountStorage(context,SSID);
-
-                inputAccount.setText(as.getLoginInfo().get(AccountStorage.ACCOUNT));
-                inputPassword.setText(as.getLoginInfo().get(AccountStorage.PASSWORD));
+                inputAccount.setText(accountManager.getAccount());
+                inputPassword.setText(accountManager.getPassword());
             }
 
             dialog.show();
@@ -115,26 +118,33 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
         }
 
         private void showSpinner(){
-            isSpinnerShow = wifiHopSpot.getCategory().size() > 1 ? true : false;
+            int defaultIndex = 0;
+            List<HotSpotOption> options = wifiHopSpot.getCategory();
+            int size = options.size();
 
-            if(isSpinnerShow){
-                int size = wifiHopSpot.getCategory().size();
-                String[] list = new String[size];
-                for (int i = 0; i < size; i++) {
-                    String displayStringID = wifiHopSpot.getCategory().get(i).getDisplayStringID();
-                    try {
-                        list[i] = getStringByResName(displayStringID);
+            //不管今天有幾個postfix，都放進下拉式選單
+            String[] list = new String[size];
+            for (int i = 0; i < size; i++) {
+                String displayStringID = options.get(i).getDisplayStringID();
+                try {
+                    if(options.get(i).getAccountPostfix().equals(accountManager.getPostfix())){
+                        defaultIndex = i;
                     }
-                    catch (NoSuchFieldException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+                    list[i] = getStringByResName(displayStringID);
                 }
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, list);
-                spinner.setAdapter(adapter);
+                catch (NoSuchFieldException | IllegalAccessException e) {
+                    //displayStringID但是在string.xml 找不到對應的name，就先用default
+                    list[i] = "default";
+                    e.printStackTrace();
+                }
             }
-            else{
-                spinner.setVisibility(View.GONE);
-            }
+//                ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, list);
+//                spinner.setAdapter(adapter);
+            spinner.setItems(list);
+            spinner.setSelectedIndex(defaultIndex);
+
+            int isVisiable = size > 1? View.VISIBLE : View.GONE;
+            spinner.setVisibility(isVisiable);
         }
 
         private String getStringByResName(String resName) throws NoSuchFieldException, IllegalAccessException {
@@ -153,12 +163,18 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
         public void onClick(View v) {
             String account = inputAccount.getText().toString();
             String password = inputPassword.getText().toString();
+
             if (account.length() == 0 || password.length() == 0) {
+                accountManager.removeAccount();
                 Toast.makeText(context, context.getText(R.string.account_dialog_error), Toast.LENGTH_SHORT).show();
                 return;
             }
-            AccountStorage as = new AccountStorage(context,SSID);
-            as.setLoginInfo(account,password);
+
+            //如果wifi type是wispr , 就拿出spinner選到的index對應到的value並存起來，如果type不是 就存空字串
+            String postfix = wifiHopSpot.getType().equals(WifiDesc.WISPr) ? wifiHopSpot.getCategory().get(spinner.getSelectedIndex()).getAccountPostfix() : "";
+
+            //不管有沒有改都重新存檔
+            accountManager.setLoginInfo(account,password,postfix);
             dialog.dismiss();
         }
     }

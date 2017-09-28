@@ -32,7 +32,6 @@ public class WISPrFragment extends DebugLogFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     public static final String WISPR_LOG_RECEIVE_ACTION = "com.pontus.wishar.WISPR_LOG_RECEIVE";
-    private static final String ARG_PARAM2 = "param2";
 
     @BindView(R.id.account) TextView account;
     @BindView(R.id.password) TextView password;

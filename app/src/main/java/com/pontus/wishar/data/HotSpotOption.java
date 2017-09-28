@@ -3,6 +3,7 @@ package com.pontus.wishar.data;
 import com.google.gson.annotations.SerializedName;
 
 public class HotSpotOption {
+    //json file內key為display_stringID的value會對應到到 displayStringID這個變數
     @SerializedName("display_stringID")
     private String displayStringID;
     @SerializedName("account_postfix")
@@ -16,11 +17,11 @@ public class HotSpotOption {
         this.displayStringID = display_stringID;
     }
 
-    public String getAccount_postfix() {
+    public String getAccountPostfix() {
         return accountPostfix;
     }
 
-    public void setAccount_postfix(String account_postfix) {
+    public void setAccountPostfix(String account_postfix) {
         this.accountPostfix = account_postfix;
     }
 }

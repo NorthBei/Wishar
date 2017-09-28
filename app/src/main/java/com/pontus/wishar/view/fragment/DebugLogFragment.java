@@ -13,8 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import static com.pontus.wishar.Constants.EXTRA_LOGIN_LOG_RESULT;
 
 /**
@@ -56,14 +54,14 @@ public abstract class DebugLogFragment extends Fragment {
 
     private class LoginLogReceiver extends BroadcastReceiver {
 
-        private final String TAG = LoginLogReceiver.class.getSimpleName();
         @Override
         public void onReceive(Context context, Intent intent) {
-            ArrayList<String> logResult = intent.getStringArrayListExtra(EXTRA_LOGIN_LOG_RESULT);
-            for (String log: logResult) {
-                onReceiveLog(log);
-                Log.d(TAG,log);
-            }
+            String log = intent.getStringExtra(EXTRA_LOGIN_LOG_RESULT);
+            onReceiveLog(log);
+//            for (String log: logResult) {
+//
+//                Log.d(TAG,log);
+//            }
         }
     }
 }

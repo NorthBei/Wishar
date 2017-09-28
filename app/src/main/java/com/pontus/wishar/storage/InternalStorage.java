@@ -20,7 +20,7 @@ public class InternalStorage {
     private static InternalStorage instance;
 
     private InternalStorage(Context context) {
-        this.context = context.getApplicationContext();;
+        this.context = context.getApplicationContext();
     }
 
     public synchronized static InternalStorage getInstance(Context context){

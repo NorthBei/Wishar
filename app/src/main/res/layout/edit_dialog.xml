@@ -7,21 +7,25 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <Spinner
+    <com.jaredrummler.materialspinner.MaterialSpinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:hint="@string/edit_dialog_spinner_hint"
+        android:drawableBottom="@color/colorAccent"
+        android:layout_marginBottom="5dp"/>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/input_account_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/input_account"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
+            android:digits="@string/edit_dialog_input_limit"
             android:hint="@string/account_dialog_account_hint" />
     </android.support.design.widget.TextInputLayout>
 
@@ -32,11 +36,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
+        <android.support.design.widget.TextInputEditText
             android:id="@+id/input_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPassword"
+            android:digits="@string/edit_dialog_input_limit"
             android:hint="@string/account_dialog_password_hint" />
     </android.support.design.widget.TextInputLayout>
 

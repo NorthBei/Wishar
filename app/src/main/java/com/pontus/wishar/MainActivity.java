@@ -12,13 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.pontus.wishar.data.HotSpot;
+import com.pontus.wishar.storage.AssetsStorage;
 import com.pontus.wishar.view.adapter.HotSpotListAdapter;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -26,12 +25,10 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String WIFI_DEF_JSON = "wifi_def.json", FORMAT = "UTF-8";
+    private static final String WIFI_DEF_JSON = "wifi_def.json";
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.fab) FloatingActionButton fab;
-
-    public static final String TPE_FREE_URL = "https://www.tpe-free.tw/tpe/tpe_login.aspx";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,15 +40,13 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
                 startActivity(new Intent(MainActivity.this, DebugActivity.class));
             }
         });
 
         //The Ultimate JSON Library: JSON.simple vs GSON vs Jackson vs JSONP
         //http://blog.takipi.com/the-ultimate-json-library-json-simple-vs-gson-vs-jackson-vs-json/
-
 
         //How to Retrieve JSON Object from assets
         //https://www.youtube.com/watch?v=szO-OFCqF6k
@@ -92,26 +87,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private ArrayList<HotSpot> parseGson() {
-        String jsonString = null;
-
-        try {
-            InputStream is = getAssets().open(WIFI_DEF_JSON);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-
-            jsonString = new String(buffer, FORMAT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (jsonString == null)
-            return null;
-
-        Gson gson = new Gson();
-        ArrayList<HotSpot> list = gson.fromJson(jsonString, new TypeToken<ArrayList<HotSpot>>() {
-        }.getType());
+        Type type = new TypeToken<ArrayList<HotSpot>>() {}.getType();
+        AssetsStorage as = new AssetsStorage(getBaseContext());
+        ArrayList<HotSpot> list = as.readFileToJson(WIFI_DEF_JSON, type);
 
         return list;
     }
