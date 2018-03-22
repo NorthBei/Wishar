@@ -12,13 +12,11 @@ import android.widget.Toast;
 
 import com.jaredrummler.materialspinner.MaterialSpinner;
 import com.pontus.wishar.R;
-import com.pontus.wishar.data.HotSpot;
-import com.pontus.wishar.data.HotSpotOption;
 import com.pontus.wishar.data.WifiDesc;
 import com.pontus.wishar.storage.AccountStorage;
+import com.pontus.wishar.storage.AssetsStorage;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -30,27 +28,26 @@ import butterknife.ButterKnife;
 
 public class HotSpotListAdapter extends RecyclerView.Adapter {
 
-    private ArrayList<HotSpot> list;
+    private String[] hotSpotList;
 
-    public HotSpotListAdapter(ArrayList<HotSpot> list) {
-        this.list = list;
+    public HotSpotListAdapter(String[] hotSpotList) {
+        this.hotSpotList = hotSpotList;
     }
 
     @Override
     public HotSpotVH onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemLayoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.hot_spot_item, null);
-        HotSpotVH viewHolder = new HotSpotVH(itemLayoutView);
-        return viewHolder;
+        return new HotSpotVH(itemLayoutView);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        ((HotSpotVH) holder).ssidName.setText(list.get(position).getSsid());
+        ((HotSpotVH) holder).ssidName.setText(hotSpotList[position]);
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return hotSpotList.length;
     }
 
     public class HotSpotVH extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -64,8 +61,11 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
 
         @Override
         public void onClick(View v) {
-            int index = getLayoutPosition();
-            new AccountInfoDialog(v.getContext(), list.get(index));
+            String wifiDescFileName = hotSpotList[getLayoutPosition()];
+            Context context = v.getContext();
+            AssetsStorage assetsStorage = new AssetsStorage(context);
+            WifiDesc descFile = assetsStorage.getWifiDescObj(wifiDescFileName);
+            new AccountInfoDialog(context, descFile);
         }
     }
 
@@ -79,14 +79,14 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
         private AlertDialog dialog;
         private String SSID;
         private AccountStorage accountManager;
-        private HotSpot wifiHopSpot;
+        private WifiDesc wifiDesc;
 
         //http://shawnba.blogspot.tw/2013/06/android-positivebutton-alertdialog.html
 
-        public AccountInfoDialog(Context context, HotSpot wifiHopSpot) {
+        public AccountInfoDialog(Context context, WifiDesc wifiDesc) {
             this.context = context;
-            this.wifiHopSpot = wifiHopSpot;
-            this.SSID = wifiHopSpot.getSsid();
+            this.wifiDesc = wifiDesc;
+            this.SSID = wifiDesc.getSsid();
             this.accountManager = new AccountStorage(context,SSID);
 
             initDialog();
@@ -97,7 +97,7 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
             ButterKnife.bind(this, dialogView);
 
             dialog = new AlertDialog.Builder(context)
-                    .setTitle(context.getString(R.string.account_dialog_title))
+                    .setTitle(SSID+context.getString(R.string.account_dialog_title))
                     .setView(dialogView)
                     .setNegativeButton(context.getString(R.string.account_dialog_cancel_btn), null)
                     .setPositiveButton(context.getString(R.string.account_dialog_check_btn), null)
@@ -119,13 +119,13 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
 
         private void showSpinner(){
             int defaultIndex = 0;
-            List<HotSpotOption> options = wifiHopSpot.getCategory();
+            List<WifiDesc.LoginType> options = wifiDesc.getLoginType();
             int size = options.size();
 
             //不管今天有幾個postfix，都放進下拉式選單
             String[] list = new String[size];
             for (int i = 0; i < size; i++) {
-                String displayStringID = options.get(i).getDisplayStringID();
+                String displayStringID = options.get(i).getDisplayName();
                 try {
                     if(options.get(i).getAccountPostfix().equals(accountManager.getPostfix())){
                         defaultIndex = i;
@@ -143,8 +143,8 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
             spinner.setItems(list);
             spinner.setSelectedIndex(defaultIndex);
 
-            int isVisiable = size > 1? View.VISIBLE : View.GONE;
-            spinner.setVisibility(isVisiable);
+            int isVisible = size > 1? View.VISIBLE : View.GONE;
+            spinner.setVisibility(isVisible);
         }
 
         private String getStringByResName(String resName) throws NoSuchFieldException, IllegalAccessException {
@@ -170,8 +170,8 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
                 return;
             }
 
-            //如果wifi type是wispr , 就拿出spinner選到的index對應到的value並存起來，如果type不是 就存空字串
-            String postfix = wifiHopSpot.getType().equals(WifiDesc.WISPr) ? wifiHopSpot.getCategory().get(spinner.getSelectedIndex()).getAccountPostfix() : "";
+            //如果wifi type是WISPr , 就拿出spinner選到的index對應到的value並存起來，如果type不是 就存空字串
+            String postfix = wifiDesc.getType().equals(WifiDesc.WISPr) ? wifiDesc.getLoginType().get(spinner.getSelectedIndex()).getAccountPostfix() : "";
 
             //不管有沒有改都重新存檔
             accountManager.setLoginInfo(account,password,postfix);

@@ -1,0 +1,18 @@
+{
+  "ssid":"..MCD Free Wi-Fi",
+  "description":"麥當勞",
+  "protocol":"https",
+  "domain":"wlangw.hinet.net",
+  "roamingSupport":[],
+  "isNeedLogin":true,
+  "type":"WISPr",
+  "parse":{
+
+  },
+  "loginType":[
+    {
+      "displayName":"TPE-Free",
+      "accountPostfix":"@tpe-free.tw"
+    }
+  ]
+}

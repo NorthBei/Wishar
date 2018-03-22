@@ -13,9 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.pontus.wishar.view.fragment.WISPrFragment;
-import com.pontus.wishar.view.fragment.WebLoginFragment;
-
 public class DebugActivity extends AppCompatActivity {
 
     /**
@@ -103,16 +100,16 @@ public class DebugActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            Fragment f;
+            Fragment f = null;
             switch (position){
-                case 0:
-                    f =  WISPrFragment.newInstance();
-                    break;
-                case 1:
-                    f =  WebLoginFragment.newInstance();
-                    break;
-                default:
-                    f = WebLoginFragment.newInstance();
+//                case 0:
+//                    f =  WISPrFragment.newInstance();
+//                    break;
+//                case 1:
+//                    f =  WebLoginFragment.newInstance();
+//                    break;
+//                default:
+//                    f = WebLoginFragment.newInstance();
             }
             return f;
         }

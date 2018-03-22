@@ -3,7 +3,6 @@ package com.pontus.wishar.storage;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.io.File;
 import java.util.Arrays;
@@ -41,9 +40,9 @@ public class PairDB {
             //全部sharedPreferences儲存的file
             String[] list = prefsdir.list();
             List<String> fileList = Arrays.asList(list);
-            for (String s: fileList) {
-                Log.d(TAG, "isTableExist: fileName:"+s);
-            }
+//            for (String s: fileList) {
+//                Timber.d("isTableExist: fileName:"+s);
+//            }
             return fileList.contains(fileName);
         }
         return false;

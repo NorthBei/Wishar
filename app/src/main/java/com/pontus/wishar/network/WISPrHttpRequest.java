@@ -4,14 +4,13 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Map;
 
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.Response;
+import timber.log.Timber;
 
 
-public class WISPrHttpRequest extends SyncHttpRequest{
+public class WISPrHttpRequest {
     private static final String TAG = WISPrHttpRequest.class.getSimpleName();
 
     private static final int MAX_REDO = 10;
@@ -29,9 +28,37 @@ public class WISPrHttpRequest extends SyncHttpRequest{
     public static final String IO_EXCEPTION = "[Warning]IOException";
     public static final String UNKNOWN_HOST = "[Warning]UnknownHostException";
 
+    private HttpReq httpReq;
+    private String requestUrl;
 
-    @Override
-    public String onSuccess(Call call,Response response) throws IOException {
+    public WISPrHttpRequest(){
+        httpReq = new HttpReq();
+    }
+
+    public String get(String url){
+        requestUrl = url;
+        try {
+            Response response = httpReq.get(url).result();
+            return onSuccess(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return onError(e);
+        }
+    }
+
+    public String post(String url, Map<String,String> parameters){
+        requestUrl = url;
+        try {
+            Response response = httpReq.post(url,parameters).result();
+            return onSuccess(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return onError(e);
+        }
+    }
+
+
+    public String onSuccess(Response response) throws IOException {
         if (response.code() == HttpURLConnection.HTTP_MOVED_TEMP) {
             //if has redirect url , get the url XML
             String location = response.header("Location");
@@ -42,7 +69,6 @@ public class WISPrHttpRequest extends SyncHttpRequest{
                 return get(location);
             }
             else{
-                call.cancel();
                 return REDIRECT_TOO_MUCH_TIMES;
             }
         }
@@ -50,17 +76,12 @@ public class WISPrHttpRequest extends SyncHttpRequest{
         return response.body().string();
     }
 
-    @Override
-    public String onError(Call call,IOException e){
-       return onErrorHandler(call,e);
-    }
-
-    private String onErrorHandler(Call call,IOException e){
+    private String onError(IOException e){
         if (e instanceof java.net.UnknownHostException) {
             //這個error會出現在wifi的連結剛建立完成的時候 立刻進行網路傳輸 會造成資料送不出去 等一下再重新送應該就可以了
 
             if(retryHostTimes < MAX_REDO) {
-                Log.d(TAG, "onError:retry after 0.5s");
+                Timber.d("onError:retry after 0.5s");
                 try {
                     Thread.sleep(500);
                     retryHostTimes++;
@@ -71,85 +92,18 @@ public class WISPrHttpRequest extends SyncHttpRequest{
                 return get(requestUrl);
             }
             else{
-                call.cancel();
                 return UNKNOWN_HOST;
             }
 
         }
         else if (e instanceof javax.net.ssl.SSLHandshakeException) {
-            Log.d(TAG, "onError: "+UNTRUST_URL+" : "+requestUrl);
+            Timber.d( "onError: "+UNTRUST_URL+" : "+requestUrl);
             return UNTRUST_URL;
         }
 
         //else : IOException
         e.printStackTrace(System.err);
-        Log.d(TAG, "onError: "+IO_EXCEPTION+" : "+e.getMessage());
+        Timber.d("onError: "+IO_EXCEPTION+" : "+e.getMessage());
         return IO_EXCEPTION;
-    }
-
-    //old WISPr HTTP request code
-    private String wisprSyncHttpRequest(String requestUrl) {
-        OkHttpClient client = new OkHttpClient().newBuilder().followRedirects(false).followSslRedirects(false).build();
-
-        Request request = new Request.Builder().url(requestUrl).build();
-
-        Call call = client.newCall(request);
-
-        try {
-            Response response = call.execute();
-            if(response.code() == HttpURLConnection.HTTP_MOVED_TEMP){
-                String location = response.header("Location");
-                //if has redirect url , get the url XML
-                return wisprSyncHttpRequest(location);
-            }
-            return response.body().string();
-
-        }
-        catch (java.net.UnknownHostException e) {
-            //這個error會出現在wifi的連結剛建立完成的時候 立刻進行網路傳輸 會造成資料送不出去 等一下再重新送應該就可以了
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-            //after 0.5s , retry
-            return wisprSyncHttpRequest(requestUrl);
-        }
-        catch (javax.net.ssl.SSLHandshakeException e) {
-            e.printStackTrace(System.err);
-            return "[Warning]Untrust certification:" + requestUrl;
-        }
-        catch (IOException e) {
-            e.printStackTrace(System.err);
-            return "[Warning]IOException:" + e.getMessage();
-        }
-
-    }
-
-    public String tryNetWorkAvailable(){
-        NetworkTestRequest n = new NetworkTestRequest();
-        return n.get(CHECK_NETWORK_URL);
-    }
-
-    private class NetworkTestRequest extends SyncHttpRequest{
-
-        @Override
-        public String onSuccess(Call call,Response response) throws IOException {
-
-            if (response.code() == HttpURLConnection.HTTP_MOVED_TEMP) {
-                //if has redirect url , get the url XML
-                String location = response.header("Location");
-                Log.d(TAG, "onResponse: Location:" + location);
-
-                return location;
-
-            }
-            return response.body().string();
-        }
-
-        @Override
-        public String onError(Call call,IOException e){
-            return onErrorHandler(call,e);
-        }
     }
 }

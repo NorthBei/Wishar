@@ -12,20 +12,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.gson.reflect.TypeToken;
-import com.pontus.wishar.data.HotSpot;
 import com.pontus.wishar.storage.AssetsStorage;
 import com.pontus.wishar.view.adapter.HotSpotListAdapter;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final String WIFI_DEF_JSON = "wifi_def.json";
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.recyclerView) RecyclerView recyclerView;
     @BindView(R.id.fab) FloatingActionButton fab;
@@ -54,14 +47,12 @@ public class MainActivity extends AppCompatActivity {
         //Reading a JSON file from RAW in Android
         //https://www.youtube.com/watch?v=gnj-Df7QQHU&t=383s
 
-        ArrayList<HotSpot> hotSpotList = parseGson();
-
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         //recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST)); //設定分割線
-        if (hotSpotList != null) {
-            HotSpotListAdapter adapter = new HotSpotListAdapter(hotSpotList);
-            recyclerView.setAdapter(adapter);
-        }
+
+        String [] list = AssetsStorage.getWifiDescList(getBaseContext());
+        HotSpotListAdapter adapter = new HotSpotListAdapter(list);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -84,13 +75,5 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private ArrayList<HotSpot> parseGson() {
-        Type type = new TypeToken<ArrayList<HotSpot>>() {}.getType();
-        AssetsStorage as = new AssetsStorage(getBaseContext());
-        ArrayList<HotSpot> list = as.readFileToJson(WIFI_DEF_JSON, type);
-
-        return list;
     }
 }

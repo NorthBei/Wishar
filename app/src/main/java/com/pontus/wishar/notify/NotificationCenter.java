@@ -6,6 +6,8 @@ import android.support.v4.app.NotificationCompat;
 
 import com.pontus.wishar.R;
 
+import static android.support.v4.app.NotificationCompat.PRIORITY_HIGH;
+
 public class NotificationCenter {
 
     private final static int NOTIFY_ID = 1207;
@@ -39,6 +41,7 @@ public class NotificationCenter {
                 .setContentTitle("Wishar")
                 .setContentText(content)
                 //.setContentIntent(pendingIntent)
+                .setPriority(PRIORITY_HIGH)
                 .setAutoCancel(true);
         //.setPriority(Notification.PRIORITY_HIGH);
 

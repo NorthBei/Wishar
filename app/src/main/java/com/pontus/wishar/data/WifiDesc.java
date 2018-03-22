@@ -1,25 +1,54 @@
 package com.pontus.wishar.data;
 
+import java.util.List;
+
 public class WifiDesc {
 
-    /* Wifi 描述檔 (wifi Description file)
-     * 描述一個wifi hot spot本身的type , login url , 認證的domain ... 資訊
+    public static final String WISPr = "WISPr";
+    /**
+     * ssid : iTaiwan
+     * description : 中央行政機關室內公共區域提供免費無線上網
+     * protocol : https
+     * domain : wlangw.hinet.net
+     * roamingSupport : ["TPE-Free"]
+     * isNeedLogin : true
+     * type : WISPr
+     * parse : {}
+     * loginType : [{"displayName":"iTaiwan","accountPostfix":"@itw"}]
      */
-    public static final String WISPr = "WISPr" , WEB_LOGIN = "webLogin" , RECORD = "record";
-    //WISPs or WebLogin
-    private String type;
-    //用來認證login service的登入網域認證是否正確
-    private String domain;
-    //有些service url 可能會包含電腦或手機的mac address or ip address , 是dynamic的, url可能會="dynamic"
-    private String url;
-    private Script script;
 
-    public String getType() {
-        return type;
+    private String ssid;
+    private String description;
+    private String protocol;
+    private String domain;
+    private boolean isNeedLogin;
+    private String type;
+    private Parse parse;
+    private List<String> roamingSupport;
+    private List<LoginType> loginType;
+
+    public String getSsid() {
+        return ssid;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setSsid(String ssid) {
+        this.ssid = ssid;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
     public String getDomain() {
@@ -30,47 +59,73 @@ public class WifiDesc {
         this.domain = domain;
     }
 
-    public String getUrl() {
-        return url;
+    public boolean isIsNeedLogin() {
+        return isNeedLogin;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setIsNeedLogin(boolean isNeedLogin) {
+        this.isNeedLogin = isNeedLogin;
     }
 
-    public Script getScript() {
-        return script;
+    public String getType() {
+        return type;
     }
 
-    public void setScript(Script script) {
-        this.script = script;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public class Script {
-        private String loginJS, success, error_type;
+    public Parse getParse() {
+        return parse;
+    }
 
-        public String getLoginJS() {
-            return loginJS;
+    public void setParse(Parse parse) {
+        this.parse = parse;
+    }
+
+    public List<String> getRoamingSupport() {
+        return roamingSupport;
+    }
+
+    public void setRoamingSupport(List<String> roamingSupport) {
+        this.roamingSupport = roamingSupport;
+    }
+
+    public List<LoginType> getLoginType() {
+        return loginType;
+    }
+
+    public void setLoginType(List<LoginType> loginType) {
+        this.loginType = loginType;
+    }
+
+    public static class Parse {
+    }
+
+    public static class LoginType {
+
+        private String displayName;
+        private String accountPostfix;
+
+        public String getDisplayName() {
+            return displayName;
         }
 
-        public void setLoginJS(String loginJS) {
-            this.loginJS = loginJS;
+        public void setDisplayName(String displayName) {
+            this.displayName = displayName;
         }
 
-        public String getSuccess() {
-            return success;
+        public String getAccountPostfix() {
+            return accountPostfix;
         }
 
-        public void setSuccess(String success) {
-            this.success = success;
-        }
-
-        public String getError_type() {
-            return error_type;
-        }
-
-        public void setError_type(String error_type) {
-            this.error_type = error_type;
+        public void setAccountPostfix(String accountPostfix) {
+            this.accountPostfix = accountPostfix;
         }
     }
+
+    /* Wifi 描述檔 (wifi Description file)
+     * 描述一個wifi hot spot本身的type , login url , 認證的domain ... 資訊
+     */
+
 }

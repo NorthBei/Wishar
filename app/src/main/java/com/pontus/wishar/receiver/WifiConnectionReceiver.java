@@ -5,21 +5,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiManager;
-import android.util.Log;
 
 import com.pontus.wishar.Constants;
-import com.pontus.wishar.data.WifiDesc;
 import com.pontus.wishar.notify.NotificationCenter;
-import com.pontus.wishar.service.WISPrLoginService;
-import com.pontus.wishar.service.WebLoginService;
+import com.pontus.wishar.service.EntryIntentService;
 import com.pontus.wishar.storage.AccountStorage;
-import com.pontus.wishar.storage.AssetsStorage;
 import com.pontus.wishar.wifi.WifiAdmin;
 
-import static android.net.wifi.WifiManager.EXTRA_NEW_STATE;
-import static android.net.wifi.WifiManager.SUPPLICANT_STATE_CHANGED_ACTION;
+import timber.log.Timber;
 
 public class WifiConnectionReceiver extends BroadcastReceiver {
 
@@ -30,13 +24,8 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(final Context context, Intent intent) {
 
-        if (intent.equals(SUPPLICANT_STATE_CHANGED_ACTION)) {
-            SupplicantState state =  intent.getParcelableExtra(EXTRA_NEW_STATE);
-
-            if (state != null && state == SupplicantState.DISCONNECTED) {
-                //訊號斷線
-                //context.stopService(new Intent(context, MyService.class));
-            }
+        if(!WifiManager.NETWORK_STATE_CHANGED_ACTION.equals(intent.getAction())){
+            //要判斷是不是系統給的action,否則可能會被第三方應用傳送intent攻擊
             return;
         }
 
@@ -49,38 +38,23 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
                 return;
 
             isConnected = true;
-            Log.d(TAG, "onReceive: CONNECT SSID:"+SSID+", Change isConnected: "+isConnected);
+            Timber.d("onReceive: Change->CONNECT SSID: %s Change isConnected: %b",SSID,isConnected);
 
             //判斷是不是Wishar的服務範圍,不是就掰掰
-            boolean isOurService =  AccountStorage.isAccountExist(context,SSID);
-            Log.d(TAG, "loginWifi:"+SSID+", isOurService:"+isOurService);
-            //isOurService = true;
+            boolean isOurService =  AccountStorage.isAccountExist(context,SSID);// || SSID.equals("..MCD Free Wi-Fi");
+            Timber.d("wifi:"+SSID+", isOurService:"+isOurService);
+
             if (!isOurService)
                 return;
 
-            //讀描述檔，這邊主要是拿type來判斷要啟動哪一個service
-            AssetsStorage as = new AssetsStorage(context);
-            WifiDesc wifiDesc = as.readFileToJson(SSID+".json", WifiDesc.class);
-
-            Class<?> cls = null;
-            switch (wifiDesc.getType()){
-                case WifiDesc.WISPr:{
-                    cls = WISPrLoginService.class;
-                    break;
-                }
-                case WifiDesc.WEB_LOGIN:{
-                    cls = WebLoginService.class;
-                    break;
-                }
-            }
-            Intent i = new Intent(context, cls);
+            Intent i = new Intent(context, EntryIntentService.class);
             i.putExtra(Constants.EXTRA_LOGIN_SSID,SSID);
             context.startService(i);
         }
         else if (isConnected && isDisconnectedIntent(intent)) {
             //如果wifi已經連上了,而且intent內容是wifi斷線
             isConnected = false;
-            Log.d(TAG, "onReceive: DISCONNECT Change isConnected: "+isConnected);
+            Timber.d("onReceive: Change->DISCONNECT isConnected: %b",isConnected);
             NotificationCenter.getInstance(context).cleanNotify();
         }
     }
@@ -88,6 +62,9 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
     private boolean isConnectedIntent(Intent intent) {
         NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
         if (networkInfo != null && networkInfo.isConnected() && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+//            WifiInfo wifiInfo = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
+//            通过反射的方式去判断wifi是否已经连接上，并且可以开始传输数据 http://www.cnblogs.com/819158327fan/p/6689120.html
+//            return checkWiFiConnectSuccess(wifiInfo);
             return true;
         }
         return false;
