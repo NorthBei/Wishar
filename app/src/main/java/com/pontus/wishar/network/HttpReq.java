@@ -28,13 +28,17 @@ public class HttpReq {
     private synchronized static OkHttpClient getHttpClient() {
         if(client == null){
             //If unset, redirects will be followed.
-            client = new OkHttpClient.Builder().connectTimeout(HTTP_TIMEOUT, TimeUnit.SECONDS).addNetworkInterceptor(new StethoInterceptor()).build();
+            client = new OkHttpClient.Builder()
+                    .connectTimeout(HTTP_TIMEOUT, TimeUnit.SECONDS)
+                    .addNetworkInterceptor(new StethoInterceptor())
+                    .cookieJar(new CookieCache())
+                    .build();
         }
         return client;
     }
 
     private Request.Builder requestBuilder(){
-        return new Request.Builder().removeHeader("User-Agent").addHeader("User-Agent", Constants.USER_AGENT);
+        return new Request.Builder().removeHeader("User-Agent").addHeader("User-Agent", Constants.USER_AGENT).addHeader("Accept-Language", Constants.ACCEPT_LANGUAGE);
     }
 
     public HttpReq get(String url){

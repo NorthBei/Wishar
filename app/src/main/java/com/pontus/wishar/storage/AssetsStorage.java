@@ -65,7 +65,7 @@ public class AssetsStorage {
         }
         //remove .json file extension
         for (int i = 0; i < list.length; i++) {
-            list[i] = list[i].replace(JSON_FILE_EXTENSION,"");
+            list[i] = list[i].replace(JSON_FILE_EXTENSION,"").replace("$.",".");
         }
         return list;
     }

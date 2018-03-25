@@ -5,6 +5,7 @@ import java.util.List;
 public class WifiDesc {
 
     public static final String WISPr = "WISPr";
+    public static final String PARSE = "Parse";
     /**
      * ssid : iTaiwan
      * description : 中央行政機關室內公共區域提供免費無線上網
@@ -26,6 +27,9 @@ public class WifiDesc {
     private Parse parse;
     private List<String> roamingSupport;
     private List<LoginType> loginType;
+    /**
+     * parse : {"formSelect":["#form1"],"inputData":[]}
+     */
 
     public String getSsid() {
         return ssid;
@@ -100,6 +104,24 @@ public class WifiDesc {
     }
 
     public static class Parse {
+        private List<String> formSelect;
+        private List<?> inputData;
+
+        public List<String> getFormSelect() {
+            return formSelect;
+        }
+
+        public void setFormSelect(List<String> formSelect) {
+            this.formSelect = formSelect;
+        }
+
+        public List<?> getInputData() {
+            return inputData;
+        }
+
+        public void setInputData(List<?> inputData) {
+            this.inputData = inputData;
+        }
     }
 
     public static class LoginType {
@@ -127,5 +149,6 @@ public class WifiDesc {
     /* Wifi 描述檔 (wifi Description file)
      * 描述一個wifi hot spot本身的type , login url , 認證的domain ... 資訊
      */
+
 
 }

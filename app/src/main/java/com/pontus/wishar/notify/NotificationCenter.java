@@ -2,6 +2,8 @@ package com.pontus.wishar.notify;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.pontus.wishar.R;
@@ -34,7 +36,7 @@ public class NotificationCenter {
 
     public void showNotify(String content){
         //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
-
+        Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setColor(context.getResources().getColor(R.color.colorPrimary))
@@ -42,8 +44,8 @@ public class NotificationCenter {
                 .setContentText(content)
                 //.setContentIntent(pendingIntent)
                 .setPriority(PRIORITY_HIGH)
+                .setSound(uri)
                 .setAutoCancel(true);
-        //.setPriority(Notification.PRIORITY_HIGH);
 
         // use uid to be notifyID
         notificationManager.notify(NOTIFY_ID, notificationBuilder.build());

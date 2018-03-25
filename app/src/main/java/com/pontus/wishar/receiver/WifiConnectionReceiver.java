@@ -1,5 +1,6 @@
 package com.pontus.wishar.receiver;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,12 +9,15 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 
 import com.pontus.wishar.Constants;
+import com.pontus.wishar.data.DescCorresp;
 import com.pontus.wishar.notify.NotificationCenter;
 import com.pontus.wishar.service.EntryIntentService;
-import com.pontus.wishar.storage.AccountStorage;
+import com.pontus.wishar.storage.db.WisharDB;
 import com.pontus.wishar.wifi.WifiAdmin;
 
 import timber.log.Timber;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 public class WifiConnectionReceiver extends BroadcastReceiver {
 
@@ -39,21 +43,37 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
 
             isConnected = true;
             Timber.d("onReceive: Change->CONNECT SSID: %s Change isConnected: %b",SSID,isConnected);
+            //SSID = SSID.equals("QSR")? "Qsquare_free":SSID;
+            //SSID = SSID.equals(".TPE-Free AD WiFi")? "$.TPE-Free AD WiFi":SSID;
+            //SSID = SSID.contains("BUS-FREE-WIFI") ? "!BUS-FREE-WIFI" : SSID;
+            DescCorresp descCorresp = WisharDB.getDB(context).descCorrespDao().getDescCorresp(SSID);
 
-            //判斷是不是Wishar的服務範圍,不是就掰掰
-            boolean isOurService =  AccountStorage.isAccountExist(context,SSID);// || SSID.equals("..MCD Free Wi-Fi");
-            Timber.d("wifi:"+SSID+", isOurService:"+isOurService);
-
-            if (!isOurService)
+            if (descCorresp == null) {
                 return;
+            }
+            //判斷是不是Wishar的服務範圍,不是就掰掰
+//            boolean isOurService =  AccountStorage.isAccountExist(context,SSID);// || SSID.equals("..MCD Free Wi-Fi");
+//            Timber.d("wifi:"+SSID+", isOurService:"+isOurService);
+//
+//            if (!isOurService)
+//                return;
 
+            //if(isServiceRunning(context)){
+                Timber.d("Service running");
+            //    return;
+            //}
             Intent i = new Intent(context, EntryIntentService.class);
             i.putExtra(Constants.EXTRA_LOGIN_SSID,SSID);
+            Timber.d("Start Service");
             context.startService(i);
         }
         else if (isConnected && isDisconnectedIntent(intent)) {
             //如果wifi已經連上了,而且intent內容是wifi斷線
             isConnected = false;
+            //if(isServiceRunning(context)){
+                Timber.d("Stop Service");
+                context.stopService(new Intent(context,EntryIntentService.class));
+            //}
             Timber.d("onReceive: Change->DISCONNECT isConnected: %b",isConnected);
             NotificationCenter.getInstance(context).cleanNotify();
         }
@@ -62,9 +82,6 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
     private boolean isConnectedIntent(Intent intent) {
         NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
         if (networkInfo != null && networkInfo.isConnected() && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
-//            WifiInfo wifiInfo = intent.getParcelableExtra(WifiManager.EXTRA_WIFI_INFO);
-//            通过反射的方式去判断wifi是否已经连接上，并且可以开始传输数据 http://www.cnblogs.com/819158327fan/p/6689120.html
-//            return checkWiFiConnectSuccess(wifiInfo);
             return true;
         }
         return false;
@@ -82,6 +99,16 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
         int wifiState = intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, WifiManager.WIFI_STATE_UNKNOWN);
         if (wifiState == WifiManager.WIFI_STATE_DISABLED || wifiState == WifiManager.WIFI_STATE_DISABLING) {
             return true;
+        }
+        return false;
+    }
+
+    private boolean isServiceRunning(Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)){
+            if("com.pontus.wishar.service.EntryIntentService".equals(service.service.getClassName())) {
+                return true;
+            }
         }
         return false;
     }

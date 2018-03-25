@@ -1,0 +1,15 @@
+{
+  "ssid":"!BUS-FREE-WIFI",
+  "description":"國光客運",
+  "protocol":"http",
+  "domain":"lhefreewifi.eastasia.cloudapp.azure.com",
+  "roamingSupport":[],
+  "isNeedLogin":false,
+  "type":"Parse",
+  "parse":{
+    "formSelect":["#form1"],
+    "inputData":[]
+  },
+  "loginType":[
+  ]
+}

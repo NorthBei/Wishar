@@ -6,6 +6,7 @@ import android.util.Log;
 import com.facebook.stetho.Stetho;
 import com.pontus.wishar.data.WifiDesc;
 import com.pontus.wishar.storage.AssetsStorage;
+import com.pontus.wishar.storage.db.WisharDB;
 
 import timber.log.Timber;
 
@@ -23,6 +24,8 @@ public class WisharApp extends Application {
             Stetho.initializeWithDefaults(this);
             Timber.plant(new Timber.DebugTree());
         }
+        //init Wishar DB
+        WisharDB.getDB(getApplicationContext());
     }
 
     private void checkWifiResource(){

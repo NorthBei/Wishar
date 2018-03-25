@@ -1,0 +1,16 @@
+{
+  "ssid":".TPE-Free AD WiFi",
+  "description":"捷運Wi-Fi",
+  "protocol":"http",
+  "domain":"www.freeadwifi.com.tw",
+  "roamingSupport":[],
+  "isNeedLogin":false,
+  "type":"Parse",
+  "parse":{
+    "loginPageUrl":"http://www.freeadwifi.com.tw/portal",
+    "formSelect":["form[name=redirect]"],
+    "inputData":[]
+  },
+  "loginType":[
+  ]
+}

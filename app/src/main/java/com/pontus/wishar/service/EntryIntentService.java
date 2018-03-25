@@ -12,14 +12,18 @@ import com.pontus.wishar.notify.NotificationCenter;
 import com.pontus.wishar.storage.AccountStorage;
 import com.pontus.wishar.storage.AssetsStorage;
 import com.pontus.wishar.wifi.LoginHandler;
+import com.pontus.wishar.wifi.ParseLogin;
 import com.pontus.wishar.wifi.WISPrLogin;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
 
 import okhttp3.Response;
 import timber.log.Timber;
 
 import static com.pontus.wishar.Constants.CHECK_URL;
+import static com.pontus.wishar.Constants.MAX_TRY_CONNECT;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -35,6 +39,7 @@ public class EntryIntentService extends IntentService {
     private String SSID;
     private AccountStorage accountStorage;
     private WifiDesc wifiDesc;
+    private int tryConnectTimes = 0;
 
     public EntryIntentService() {
         super("EntryIntentService");
@@ -50,8 +55,21 @@ public class EntryIntentService extends IntentService {
         //get wifi description file
         AssetsStorage as = new AssetsStorage(context);
         wifiDesc = as.getWifiDescObj(SSID);
+        notifyUser(true,"開始嘗試自動登入");
+        tryLoginIfOffline();
+
+        Timber.d("onHandleIntent: end");
+    }
+
+    private void tryLoginIfOffline(){
+        tryConnectTimes++;
+        if(tryConnectTimes >= MAX_TRY_CONNECT){
+            notifyUser(false,"try Login for "+ tryConnectTimes +" times,but also error");
+            return;
+        }
 
         try {
+            Thread.sleep(500);
             HttpReq httpReq = new HttpReq();//"https://www.wifly.com.tw/MCD/login.aspx"
             Response response = httpReq.get(CHECK_URL).result();
 
@@ -63,22 +81,33 @@ public class EntryIntentService extends IntentService {
             }
 
             if(response.body() != null) {
-                getLoginHandler().onNetworkUnavailable(response.body().string());
+                String url = response.request().url().toString();
+                Timber.d(url);
+                String responseString = response.body().string();
+                Timber.d(responseString);
+                getLoginHandler().onNetworkUnavailable(responseString);
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            Timber.d("onError: %s",e.getMessage());
-            if (e instanceof java.net.UnknownHostException) {
-                //這個error會出現在wifi的連結剛建立完成的時候 立刻進行網路傳輸 會造成資料送不出去 等一下再重新送應該就可以了
-                notifyUser(false,"出了點問題，重新連接(get some problem ,retry now)");
-                return;
-            }
-            notifyUser(false,e.getMessage());
 
         }
-
-        Timber.d("onHandleIntent: end");
+        catch (UnknownHostException e){
+            Timber.d("出了點問題，重新連接(get some problem ,retry now)");
+            //SocketException會出現的時機參考http://www.voidcn.com/article/p-vbaskgpq-gt.html
+            //UnknownHostException會出現在wifi的連結剛建立完成的時候 立刻進行網路傳輸 會造成資料送不出去 等一下再重新送應該就可以了
+            notifyUser(false,"出了點問題，重新連接(get some problem ,retry now)");
+            tryLoginIfOffline();
+        }
+        catch (SocketTimeoutException e){
+            notifyUser(false,"超時無法連線，可能是訊號太弱");
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            Timber.d("onError: %s",e.getMessage());
+            notifyUser(false,e.getMessage());
+        }
+        catch (InterruptedException e) {
+            //call Thread.sleep()可能會出現的error，出現我也不知道怎麼辦，忽略吧QQ
+            e.printStackTrace();
+        }
     }
 
     protected void notifyUser(boolean isSuccess, String msg){
@@ -93,6 +122,8 @@ public class EntryIntentService extends IntentService {
         switch (wifiDesc.getType()){
             case WifiDesc.WISPr:
                 return new WISPrLogin(context,SSID,wifiDesc);
+            case WifiDesc.PARSE:
+                return new ParseLogin(context,SSID,wifiDesc);
         }
 
         return new LoginHandler(context,SSID,wifiDesc) {

@@ -140,8 +140,10 @@ public class HotSpotListAdapter extends RecyclerView.Adapter {
             }
 //                ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, list);
 //                spinner.setAdapter(adapter);
-            spinner.setItems(list);
-            spinner.setSelectedIndex(defaultIndex);
+            if(size > 0) {
+                spinner.setItems(list);
+                spinner.setSelectedIndex(defaultIndex);
+            }
 
             int isVisible = size > 1? View.VISIBLE : View.GONE;
             spinner.setVisibility(isVisible);
