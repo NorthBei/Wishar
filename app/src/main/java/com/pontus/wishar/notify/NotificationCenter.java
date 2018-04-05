@@ -8,7 +8,9 @@ import android.support.v4.app.NotificationCompat;
 
 import com.pontus.wishar.R;
 
-import static android.support.v4.app.NotificationCompat.PRIORITY_HIGH;
+import timber.log.Timber;
+
+import static android.support.v4.app.NotificationCompat.PRIORITY_MAX;
 
 public class NotificationCenter {
 
@@ -16,6 +18,7 @@ public class NotificationCenter {
     private static NotificationCenter instance;
     private NotificationManager notificationManager;
     private Context context;
+    private static String SSID = "";
 
     public static synchronized NotificationCenter getInstance(Context context){
         if(instance == null){
@@ -34,20 +37,27 @@ public class NotificationCenter {
         notificationManager.cancel(NOTIFY_ID);
     }
 
-    public void showNotify(String content){
+    public void showNotify(String msg){
+        String content = String.format("%s:%s",SSID,msg);
         //PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 , intent, PendingIntent.FLAG_ONE_SHOT);
         Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setColor(context.getResources().getColor(R.color.colorPrimary))
-                .setContentTitle("Wishar")
+                .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(content)
+                .setStyle(new NotificationCompat.BigTextStyle().bigText(content))
                 //.setContentIntent(pendingIntent)
-                .setPriority(PRIORITY_HIGH)
+                .setPriority(PRIORITY_MAX)
                 .setSound(uri)
                 .setAutoCancel(true);
 
         // use uid to be notifyID
         notificationManager.notify(NOTIFY_ID, notificationBuilder.build());
+        Timber.d("notifyUser:%s",content);
+    }
+
+    public static void setSsid(String SSID) {
+        NotificationCenter.SSID = SSID;
     }
 }

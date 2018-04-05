@@ -1,0 +1,39 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "fa99b6e22ce9d06fcb8fa1328b91b650",
+    "entities": [
+      {
+        "tableName": "DescCorr",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`ssid` TEXT NOT NULL, `wifi_desc` TEXT NOT NULL, PRIMARY KEY(`ssid`))",
+        "fields": [
+          {
+            "fieldPath": "ssid",
+            "columnName": "ssid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wifiDescFileName",
+            "columnName": "wifi_desc",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "ssid"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"fa99b6e22ce9d06fcb8fa1328b91b650\")"
+    ]
+  }
+}

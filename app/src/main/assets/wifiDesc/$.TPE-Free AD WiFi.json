@@ -1,16 +1,34 @@
 {
-  "ssid":".TPE-Free AD WiFi",
+  "scriptName":"$.TPE-Free AD WiFi",
   "description":"捷運Wi-Fi",
   "protocol":"http",
   "domain":"www.freeadwifi.com.tw",
+  "redirectPageHost":["hotspots.freeadwifi.com.tw"],
   "roamingSupport":[],
   "isNeedLogin":false,
   "type":"Parse",
-  "parse":{
-    "loginPageUrl":"http://www.freeadwifi.com.tw/portal",
-    "formSelect":["form[name=redirect]"],
-    "inputData":[]
-  },
+  "parse":[
+    {
+      "formSelector":"form[name=redirect]",
+      "inputData":[]
+    },
+    {
+      "formSelector":"form[name=redirect]",
+      "inputData":[]
+    },
+    {
+      "formSelector":"form[name=redirect]",
+      "inputData":[]
+    },
+    {
+      "formSelector":"form[name=redirect]",
+      "inputData":[]
+    },
+    {
+      "formSelector":"form[name=redirect]",
+      "inputData":[]
+    }
+  ],
   "loginType":[
   ]
 }

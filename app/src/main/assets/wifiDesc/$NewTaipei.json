@@ -1,0 +1,13 @@
+{
+  "scriptName":"$NewTaipei",
+  "description":"Taipei Free 臺北公眾區免費無線上網",
+  "protocol":"https",
+  "domain":"newtaipei.cht.com.tw",
+  "redirectPageHost":["newtaipei.cht.com.tw"],
+  "roamingSupport":[],
+  "isNeedLogin":false,
+  "type":"Test",
+  "parse":[],
+  "loginType":[
+  ]
+}

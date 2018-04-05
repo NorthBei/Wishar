@@ -1,6 +1,6 @@
 package com.pontus.wishar;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,8 +12,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.pontus.wishar.storage.AssetsStorage;
+import com.pontus.wishar.data.DescCorr;
+import com.pontus.wishar.data.HotSpotListBuilder;
+import com.pontus.wishar.storage.db.WisharDB;
 import com.pontus.wishar.view.adapter.HotSpotListAdapter;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,11 +34,11 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                startActivity(new Intent(MainActivity.this, DebugActivity.class));
             }
         });
 
@@ -50,8 +54,10 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         //recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST)); //設定分割線
 
-        String [] list = AssetsStorage.getWifiDescList(getBaseContext());
-        HotSpotListAdapter adapter = new HotSpotListAdapter(list);
+        Context context = getBaseContext();
+        List<DescCorr> corrList = WisharDB.getDB(context).descCorrespDao().getDescCorrList();
+        HotSpotListBuilder status = new HotSpotListBuilder(context,corrList);
+        HotSpotListAdapter adapter = new HotSpotListAdapter(status);
         recyclerView.setAdapter(adapter);
     }
 

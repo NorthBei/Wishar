@@ -9,9 +9,13 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 
 import com.pontus.wishar.Constants;
-import com.pontus.wishar.data.DescCorresp;
+import com.pontus.wishar.data.DescCorr;
+import com.pontus.wishar.data.WifiDesc;
+import com.pontus.wishar.data.WifiDescCache;
 import com.pontus.wishar.notify.NotificationCenter;
 import com.pontus.wishar.service.EntryIntentService;
+import com.pontus.wishar.storage.AccountStorage;
+import com.pontus.wishar.storage.CheckStorage;
 import com.pontus.wishar.storage.db.WisharDB;
 import com.pontus.wishar.wifi.WifiAdmin;
 
@@ -21,7 +25,6 @@ import static android.content.Context.ACTIVITY_SERVICE;
 
 public class WifiConnectionReceiver extends BroadcastReceiver {
 
-    private static final String TAG = WifiConnectionReceiver.class.getSimpleName();
     private static final String EXCEPT_SSID_1 = "<unknown ssid>" , EXCEPT_SSID_2 = "0x";
     private static boolean isConnected = false;
 
@@ -42,38 +45,47 @@ public class WifiConnectionReceiver extends BroadcastReceiver {
                 return;
 
             isConnected = true;
-            Timber.d("onReceive: Change->CONNECT SSID: %s Change isConnected: %b",SSID,isConnected);
-            //SSID = SSID.equals("QSR")? "Qsquare_free":SSID;
-            //SSID = SSID.equals(".TPE-Free AD WiFi")? "$.TPE-Free AD WiFi":SSID;
-            //SSID = SSID.contains("BUS-FREE-WIFI") ? "!BUS-FREE-WIFI" : SSID;
-            DescCorresp descCorresp = WisharDB.getDB(context).descCorrespDao().getDescCorresp(SSID);
+            Timber.d("onReceive: Change- >CONNECT SSID:%s, isConnected: %b",SSID,isConnected);
+            //判斷是不是Wishar的服務範圍,不是就掰掰
+            DescCorr descCorr = WisharDB.getDB(context).descCorrespDao().getDescCorr(SSID);
 
-            if (descCorresp == null) {
+            if (descCorr == null) {
+                //這個公共wifi Wishar不支援
+                Timber.d("%s not support",SSID);
                 return;
             }
-            //判斷是不是Wishar的服務範圍,不是就掰掰
-//            boolean isOurService =  AccountStorage.isAccountExist(context,SSID);// || SSID.equals("..MCD Free Wi-Fi");
-//            Timber.d("wifi:"+SSID+", isOurService:"+isOurService);
-//
-//            if (!isOurService)
-//                return;
+            String wifiDescName = descCorr.getWifiDescFileName();
 
-            //if(isServiceRunning(context)){
-                Timber.d("Service running");
-            //    return;
-            //}
+            WifiDesc wifiDesc = WifiDescCache.getCache().getWifiDesc(context,wifiDescName);
+            Timber.d("onReceive: wifiDescName:%s",wifiDescName);
+            if(wifiDesc.isNeedLogin()){
+                boolean isOurService =  AccountStorage.isAccountExist(context,wifiDescName);
+                if(!isOurService)
+                    return;
+            }
+            else if(!CheckStorage.isCheckStatusExist(context,wifiDescName)){
+                return;
+            }
+
+            if(isServiceRunning(context)){
+                Timber.d("onReceive: Service running");
+                return;
+            }
+
+            NotificationCenter.setSsid(SSID);
+
             Intent i = new Intent(context, EntryIntentService.class);
-            i.putExtra(Constants.EXTRA_LOGIN_SSID,SSID);
-            Timber.d("Start Service");
+            i.putExtra(Constants.EXTRA_WIFI_DESC_NAME,wifiDescName);
+            Timber.d("onReceive: Start Service");
             context.startService(i);
         }
         else if (isConnected && isDisconnectedIntent(intent)) {
             //如果wifi已經連上了,而且intent內容是wifi斷線
             isConnected = false;
-            //if(isServiceRunning(context)){
-                Timber.d("Stop Service");
+            if(isServiceRunning(context)){
+                Timber.d("onReceive: Stop Service");
                 context.stopService(new Intent(context,EntryIntentService.class));
-            //}
+            }
             Timber.d("onReceive: Change->DISCONNECT isConnected: %b",isConnected);
             NotificationCenter.getInstance(context).cleanNotify();
         }

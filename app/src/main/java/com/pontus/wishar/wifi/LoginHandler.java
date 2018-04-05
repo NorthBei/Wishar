@@ -5,21 +5,21 @@ import android.content.Context;
 import com.pontus.wishar.data.WifiDesc;
 import com.pontus.wishar.storage.AccountStorage;
 
+import java.io.IOException;
+
 public abstract class LoginHandler{
 
     protected Context context;
-    protected String SSID;
     protected WifiDesc wifiDesc;
     protected AccountStorage accountStorage;
 
-    public LoginHandler(Context context,String SSID,WifiDesc wifiDesc){
+    public LoginHandler(Context context,WifiDesc wifiDesc){
         this.context = context;
-        this.SSID = SSID;
         this.wifiDesc = wifiDesc;
-        accountStorage = new AccountStorage(context,SSID);
+        accountStorage = new AccountStorage(context,wifiDesc.getScriptName());
     }
 
-    public abstract void onNetworkUnavailable(String result);
+    public abstract void onNetworkUnavailable(String result) throws IOException;
 
     protected AccountStorage getAccountStorage(){
         return accountStorage;
@@ -29,8 +29,8 @@ public abstract class LoginHandler{
         return context;
     }
 
-    public String getSSID() {
-        return SSID;
+    public String getSsid() {
+        return wifiDesc.getSsid();
     }
 
     public WifiDesc getWifiDesc() {

@@ -1,15 +1,17 @@
 {
-  "ssid":"Qsquare_free",
+  "scriptName":"$Qsquare_free",
   "description":"京站廣場",
   "protocol":"http",
   "domain":"192.168.10.1",
   "roamingSupport":[],
   "isNeedLogin":false,
   "type":"Parse",
-  "parse":{
-    "formSelect":["#f"],
-    "inputData":[]
-  },
+  "parse":[
+    {
+      "formSelector":"#f",
+      "inputData":[]
+    }
+  ],
   "loginType":[
   ]
 }

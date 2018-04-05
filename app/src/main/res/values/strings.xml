@@ -3,13 +3,15 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_debug">DebugActivity</string>
 
-    <string name="account_dialog_title">登入資訊</string>
+    <string name="account_dialog_title"> 登入資訊</string>
     <string name="account_dialog_account_hint">帳號</string>
     <string name="account_dialog_password_hint">密碼</string>
-    <string name="account_dialog_check_btn">確定</string>
-    <string name="account_dialog_cancel_btn">取消</string>
-
     <string name="account_dialog_error">請輸入帳號或密碼</string>
+
+    <string name="dialog_check_btn">確定</string>
+    <string name="dialog_cancel_btn">取消</string>
+
+    <string name="check_dialog_msg">要讓Wishar自動點選廣告連接WiFi嗎?</string>
 
     <!--display_stringID list-->
     <string name="chunghwa">中華漫遊</string>

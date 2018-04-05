@@ -8,8 +8,8 @@ import android.support.annotation.NonNull;
 /**
  * Created by NorthBei on 2018/3/25.
  */
-@Entity(tableName = "DescCorresp")
-public class DescCorresp {
+@Entity(tableName = "DescCorr")
+public class DescCorr {
 
     @NonNull
     @PrimaryKey
@@ -20,7 +20,7 @@ public class DescCorresp {
     @ColumnInfo(name = "wifi_desc")
     private final String wifiDescFileName;
 
-    public DescCorresp(@NonNull String ssid,@NonNull String wifiDescFileName) {
+    public DescCorr(@NonNull String ssid, @NonNull String wifiDescFileName) {
         this.ssid = ssid;
         this.wifiDescFileName = wifiDescFileName;
     }
@@ -33,10 +33,5 @@ public class DescCorresp {
     @NonNull
     public String getWifiDescFileName() {
         return wifiDescFileName;
-    }
-
-    @Override
-    public String toString(){
-        return String.format("{ssid:%s,wifi_desc:%s}",ssid,wifiDescFileName);
     }
 }

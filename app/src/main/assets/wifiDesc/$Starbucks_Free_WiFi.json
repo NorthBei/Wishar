@@ -1,16 +1,16 @@
 {
-  "scriptName":"$..MCD Free Wi-Fi",
-  "description":"麥當勞無線上網服務",
+  "scriptName":"$Starbucks_Free_WiFi",
+  "description":"星巴克無線上網服務",
   "protocol":"https",
   "domain":"wac.wifly.com.tw",
   "redirectPageHost":[],
   "roamingSupport":[],
   "isNeedLogin":true,
   "type":"Parse",
-  "jumpToUrl":"https://www.wifly.com.tw/MCD/login.aspx",
+  "jumpToUrl":"http://www.wifly.com.tw/StarbucksFree/login.aspx?DeviceKind=2&RTYPE=2",
   "parse":[
     {
-      "formSelector":"#Form1",
+      "formSelector":"#frm",
       "inputData":[
         {
           "key":"username",
@@ -19,13 +19,9 @@
         {
           "key":"password",
           "value":"%password%"
-        },
-        {
-          "key":"__EVENTTARGET",
-          "value":"LoginBtn"
         }
       ],
-      "actionUrl":"https://www.wifly.com.tw/MCD/Login.aspx"
+      "actionUrl":"https://member.wifly.com.tw/MemberNew/LoginS1.aspx"
     },
     {
       "formSelector":"#frm",

@@ -4,6 +4,8 @@ import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.pontus.wishar.Constants;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -21,24 +23,35 @@ import okhttp3.Response;
 public class HttpReq {
 
     private Request request;
-    private static final int HTTP_TIMEOUT = 5;//seconds
+    private static final int HTTP_TIMEOUT = 20;//seconds
     //singleton , 全部只需要1個 http client就夠了，省資源
     private static OkHttpClient client = null;
 
     private synchronized static OkHttpClient getHttpClient() {
         if(client == null){
             //If unset, redirects will be followed.
-            client = new OkHttpClient.Builder()
-                    .connectTimeout(HTTP_TIMEOUT, TimeUnit.SECONDS)
-                    .addNetworkInterceptor(new StethoInterceptor())
-                    .cookieJar(new CookieCache())
-                    .build();
+            try {
+                client = new OkHttpClient.Builder()
+                        .sslSocketFactory(new SSLSocketFactoryExtended(),SSLSocketFactoryExtended.myX509TrustManager)
+                        .connectTimeout(HTTP_TIMEOUT, TimeUnit.SECONDS) // connect timeout
+                        .readTimeout(HTTP_TIMEOUT,TimeUnit.SECONDS) // socket timeout
+                        .addNetworkInterceptor(new StethoInterceptor())
+                        .cookieJar(new CookieCache())
+                        .build();
+            }
+            catch (NoSuchAlgorithmException | KeyManagementException e) {
+                e.printStackTrace();
+            }
         }
         return client;
     }
 
     private Request.Builder requestBuilder(){
-        return new Request.Builder().removeHeader("User-Agent").addHeader("User-Agent", Constants.USER_AGENT).addHeader("Accept-Language", Constants.ACCEPT_LANGUAGE);
+        return new Request.Builder()
+                .removeHeader("User-Agent")
+                .addHeader("User-Agent", Constants.USER_AGENT)
+                .addHeader("Accept-Language", Constants.ACCEPT_LANGUAGE)
+                .addHeader("Accept-Encoding",Constants.ACCEPT_ENCODE);
     }
 
     public HttpReq get(String url){

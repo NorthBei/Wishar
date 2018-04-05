@@ -1,5 +1,7 @@
 package com.pontus.wishar.network;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,12 +16,12 @@ public class CookieCache implements CookieJar{
     private Map<String,List<Cookie>> cookieCache = new HashMap<>();
 
     @Override
-    public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+    public void saveFromResponse(@NonNull HttpUrl url, List<Cookie> cookies) {
         cookieCache.put(url.host(),cookies);
     }
 
     @Override
-    public List<Cookie> loadForRequest(HttpUrl url) {
+    public List<Cookie> loadForRequest(@NonNull HttpUrl url) {
         if(cookieCache.containsKey(url.host())){
             return cookieCache.get(url.host());
         }

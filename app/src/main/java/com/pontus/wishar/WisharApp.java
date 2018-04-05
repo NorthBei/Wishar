@@ -1,7 +1,6 @@
 package com.pontus.wishar;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.facebook.stetho.Stetho;
 import com.pontus.wishar.data.WifiDesc;
@@ -23,6 +22,7 @@ public class WisharApp extends Application {
             //checkWifiResource();
             Stetho.initializeWithDefaults(this);
             Timber.plant(new Timber.DebugTree());
+            Timber.plant(new FileLoggingTree(getApplicationContext()));
         }
         //init Wishar DB
         WisharDB.getDB(getApplicationContext());
@@ -36,8 +36,7 @@ public class WisharApp extends Application {
             AssetsStorage as = new AssetsStorage(getBaseContext());
             //看看各個wifi有沒有相對應的描述檔
             WifiDesc wifiDesc = as.getWifiDescObj(wifiName);
-            String SSID = wifiDesc.getSsid();
-            Log.d(TAG, "checkWifiResource: SSID:"+SSID);
+            String SSID = wifiDesc.getScriptName();
 
             if(wifiDesc == null){
                 throw new AssertionError(SSID+":沒有描述檔案");

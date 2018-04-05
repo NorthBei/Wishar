@@ -1,42 +1,47 @@
 package com.pontus.wishar.data;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
+
+import static com.pontus.wishar.Constants.WIFI_DESC_SCRIPT_PREFIX;
 
 public class WifiDesc {
 
     public static final String WISPr = "WISPr";
     public static final String PARSE = "Parse";
-    /**
-     * ssid : iTaiwan
-     * description : 中央行政機關室內公共區域提供免費無線上網
-     * protocol : https
-     * domain : wlangw.hinet.net
-     * roamingSupport : ["TPE-Free"]
-     * isNeedLogin : true
-     * type : WISPr
-     * parse : {}
-     * loginType : [{"displayName":"iTaiwan","accountPostfix":"@itw"}]
-     */
 
-    private String ssid;
+    private String scriptName;
     private String description;
     private String protocol;
     private String domain;
     private boolean isNeedLogin;
     private String type;
-    private Parse parse;
     private List<String> roamingSupport;
     private List<LoginType> loginType;
-    /**
-     * parse : {"formSelect":["#form1"],"inputData":[]}
-     */
+    private List<String> redirectPageHost;
+    private String jumpToUrl;
+    @SerializedName("parse")
+    private List<Parse> parseList;
 
-    public String getSsid() {
-        return ssid;
+    public String getJumpToUrl() {
+        return jumpToUrl;
     }
 
-    public void setSsid(String ssid) {
-        this.ssid = ssid;
+    public void setJumpToUrl(String jumpToUrl) {
+        this.jumpToUrl = jumpToUrl;
+    }
+
+    public String getScriptName() {
+        return scriptName;
+    }
+
+    public String getSsid() {
+        return getScriptName().replace(WIFI_DESC_SCRIPT_PREFIX,"");
+    }
+
+    public void setScriptName(String scriptName) {
+        this.scriptName = scriptName;
     }
 
     public String getDescription() {
@@ -63,7 +68,7 @@ public class WifiDesc {
         this.domain = domain;
     }
 
-    public boolean isIsNeedLogin() {
+    public boolean isNeedLogin() {
         return isNeedLogin;
     }
 
@@ -79,12 +84,12 @@ public class WifiDesc {
         this.type = type;
     }
 
-    public Parse getParse() {
-        return parse;
+    public List<Parse> getParseList() {
+        return parseList;
     }
 
-    public void setParse(Parse parse) {
-        this.parse = parse;
+    public void setParseList(List<Parse> parseList) {
+        this.parseList = parseList;
     }
 
     public List<String> getRoamingSupport() {
@@ -103,24 +108,70 @@ public class WifiDesc {
         this.loginType = loginType;
     }
 
+    public List<String> getRedirectPageHost() {
+        return redirectPageHost;
+    }
+
+    public void setRedirectPageHost(List<String> redirectPageHost) {
+        this.redirectPageHost = redirectPageHost;
+    }
+
+    public String getUrl(){
+        return String.format("%s://%s/",getProtocol(),getDomain());
+    }
+
     public static class Parse {
-        private List<String> formSelect;
-        private List<?> inputData;
+        private String actionUrl;
+        private String formSelector;
+        private List<KeyValue> inputData;
 
-        public List<String> getFormSelect() {
-            return formSelect;
+        public String getActionUrl() {
+            return actionUrl;
         }
 
-        public void setFormSelect(List<String> formSelect) {
-            this.formSelect = formSelect;
+        public void setActionUrl(String actionUrl) {
+            this.actionUrl = actionUrl;
         }
 
-        public List<?> getInputData() {
+        public String getFormSelector() {
+            return formSelector;
+        }
+
+        public void setFormSelector(String formSelector) {
+            this.formSelector = formSelector;
+        }
+
+        public List<KeyValue> getInputData() {
             return inputData;
         }
 
-        public void setInputData(List<?> inputData) {
+        public void setInputData(List<KeyValue> inputData) {
             this.inputData = inputData;
+        }
+
+        public static class KeyValue {
+
+            public static final String LOAD_USERNAME = "%username%";
+            public static final String LOAD_PASSWORD = "%password%";
+
+            private String key;
+            private String value;
+
+            public String getKey() {
+                return key;
+            }
+
+            public void setKey(String key) {
+                this.key = key;
+            }
+
+            public String getValue() {
+                return value;
+            }
+
+            public void setValue(String value) {
+                this.value = value;
+            }
         }
     }
 
@@ -145,10 +196,4 @@ public class WifiDesc {
             this.accountPostfix = accountPostfix;
         }
     }
-
-    /* Wifi 描述檔 (wifi Description file)
-     * 描述一個wifi hot spot本身的type , login url , 認證的domain ... 資訊
-     */
-
-
 }

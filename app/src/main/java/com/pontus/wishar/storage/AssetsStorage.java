@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.gson.Gson;
 import com.pontus.wishar.data.WifiDesc;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
@@ -65,8 +66,18 @@ public class AssetsStorage {
         }
         //remove .json file extension
         for (int i = 0; i < list.length; i++) {
-            list[i] = list[i].replace(JSON_FILE_EXTENSION,"").replace("$.",".");
+            list[i] = list[i].replace(JSON_FILE_EXTENSION,"");
         }
         return list;
+    }
+
+    public static String[] getRecords(Context context){
+        File prefsdir = new File(context.getApplicationInfo().dataDir,"shared_prefs");
+
+        if(prefsdir.exists() && prefsdir.isDirectory()){
+            String[] list = prefsdir.list();
+            return list;
+        }
+        return new String[0];
     }
 }

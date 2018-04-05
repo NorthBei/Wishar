@@ -5,15 +5,15 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import com.huma.room_for_asset.RoomAsset;
-import com.pontus.wishar.data.DescCorresp;
+import com.pontus.wishar.data.DescCorr;
 
 /**
  * Created by NorthBei on 2018/3/25.
  */
 
-@Database(entities = {DescCorresp.class}, version = 2)
+@Database(entities = {DescCorr.class}, version = 2)
 public abstract  class WisharDB extends RoomDatabase {
-    public abstract DescCorrespDao descCorrespDao();
+    public abstract DescCorrDao descCorrespDao();
 
     private static WisharDB db;
 

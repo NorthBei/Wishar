@@ -1,14 +1,13 @@
 {
-  "ssid":"TPE-Free",
+  "scriptName":"$TPE-Free",
   "description":"Taipei Free 臺北公眾區免費無線上網",
   "protocol":"https",
   "domain":"wlangw.hinet.net",
+  "redirectPageHost":["www.tpe-free.tw"],
   "roamingSupport":[],
   "isNeedLogin":true,
   "type":"WISPr",
-  "parse":{
-
-  },
+  "parse":[],
   "loginType":[
     {
       "displayName":"TPE-Free",
