@@ -21,6 +21,7 @@
 
     <string name="edit_dialog_spinner_hint">帳戶類型</string>
     <string name="edit_dialog_input_limit">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%+?\*_"'()-:</string>
+    <string name="title_activity_maps">Map</string>
 
 
 </resources>

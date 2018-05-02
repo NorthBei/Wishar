@@ -1,9 +1,13 @@
 package com.pontus.wishar;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.pontus.wishar.data.DescCorr;
 import com.pontus.wishar.data.HotSpotListBuilder;
 import com.pontus.wishar.storage.db.WisharDB;
@@ -23,9 +30,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
-    @BindView(R.id.toolbar) Toolbar toolbar;
-    @BindView(R.id.recyclerView) RecyclerView recyclerView;
-    @BindView(R.id.fab) FloatingActionButton fab;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.recyclerView)
+    RecyclerView recyclerView;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,9 +67,11 @@ public class MainActivity extends AppCompatActivity {
 
         Context context = getBaseContext();
         List<DescCorr> corrList = WisharDB.getDB(context).descCorrespDao().getDescCorrList();
-        HotSpotListBuilder status = new HotSpotListBuilder(context,corrList);
+        HotSpotListBuilder status = new HotSpotListBuilder(context, corrList);
         HotSpotListAdapter adapter = new HotSpotListAdapter(status);
         recyclerView.setAdapter(adapter);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
     }
 
     @Override
@@ -77,9 +90,34 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return true;
+            }
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+                                intent.putExtra("location", location);
+                                startActivity(intent);
+                            }
+                        }
+                    });
+            //startActivity(new Intent(this,MapsActivity.class));
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 }

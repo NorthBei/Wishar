@@ -27,10 +27,21 @@ import timber.log.Timber;
 public class Firebase   {
 
     private FirebaseAnalytics mFirebaseAnalytics;
-    //Location location; // location
+    Location location;
+    String lat,lng;
 
     public Firebase(Context context) {
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
+        location = LocationUtils.getInstance( context ).showLocation();
+        if (location != null) {
+
+            lat=Double.toString(location.getLatitude());
+            lng=Double.toString(location.getLongitude());
+            String address = "Latitude：" +lat  + "Longitude：" + lng;
+            Timber.d("LocationUtils"+ address );
+        }
+
+
 
     }
 
@@ -73,23 +84,14 @@ public class Firebase   {
     }
     public void LoginInfo(String name,  String speed,  String result, String deviceId,String type) {
         //Timber.d("name: "+name+" ,speed: "+speed+" ,result: "+result+" ,deviceId: "+deviceId);
-  
-       /* getLocation();
-        String lat="",lng="";
-        try{
-            lat=Double.toString(location.getLatitude()) ;
-            lng=Double.toString(location.getLongitude());
 
-        }catch (Exception e){
-
-        }*/
 
         Date currentTime = Calendar.getInstance().getTime();
         String mac =getNewMac();
         Bundle bundle= new Bundle();
 
-        //bundle.putString("Latitude", lat);
-        //bundle.putString("Longitude",lng);
+        bundle.putString("Latitude", lat);
+        bundle.putString("Longitude",lng);
         bundle.putString("SsidName",name);
         bundle.putString("SsidMac",mac);
         //bundle.putString("Speed",speed);
@@ -102,113 +104,5 @@ public class Firebase   {
         Timber.d("name: "+name+" ,mac: "+mac+" ,speed: "+speed+" ,currentTime: "+currentTime.toString()+" ,deviceId: "+deviceId );
 
     }
-/*
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }*/
-   /* public Location getLocation() {
-        // The minimum distance to change Updates in meters
-         final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
-
-        // The minimum time between updates in milliseconds
-        final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
-
-        // flag for GPS status
-        boolean isGPSEnabled = false;
-
-        // flag for network status
-        boolean isNetworkEnabled = false;
-
-        // flag for GPS status
-        boolean canGetLocation = false;
-        LocationManager locationManager;
-
-        double latitude; // latitude
-        double longitude; // longitude
-
-        try {
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-            // getting GPS status
-            isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-
-            // getting network status
-            isNetworkEnabled = locationManager
-                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
-            if (!isGPSEnabled && !isNetworkEnabled) {
-                // no network provider is enabled
-            } else {
-                canGetLocation = true;
-                // First get location from Network Provider
-                if (isNetworkEnabled) {
-                    locationManager.requestLocationUpdates(
-                            LocationManager.NETWORK_PROVIDER,
-                            MIN_TIME_BW_UPDATES,
-                            MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                    Log.d("Network", "Network");
-                    if (locationManager != null) {
-                        location = locationManager
-                                .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-                        if (location != null) {
-                            latitude = location.getLatitude();
-                            longitude = location.getLongitude();
-                        }
-                    }
-                }
-
-                // if GPS Enabled get lat/long using GPS Services
-                if (isGPSEnabled) {
-                    if (location == null) {
-                        locationManager.requestLocationUpdates(
-                                LocationManager.GPS_PROVIDER,
-                                MIN_TIME_BW_UPDATES,
-                                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                        Log.d("GPS Enabled", "GPS Enabled");
-                        if (locationManager != null) {
-                            location = locationManager
-                                    .getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-                            if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
-                            }
-                        }
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return location;
-    }
-*/
 
 }

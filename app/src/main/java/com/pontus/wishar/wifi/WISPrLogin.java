@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.pontus.wishar.data.WifiDesc;
+import com.pontus.wishar.network.Firebase;
 import com.pontus.wishar.network.HttpReq;
 import com.pontus.wishar.notify.NotificationCenter;
 import com.pontus.wishar.storage.AccountStorage;
@@ -40,9 +41,10 @@ public class WISPrLogin extends LoginHandler {
     private static final Pattern m_pLogoffURL = Pattern.compile(
             "<WISPAccessGatewayParam.*<AuthenticationReply.*<LogoffURL>(.*)</LogoffURL>.*</AuthenticationReply>.*</WISPAccessGatewayParam>",
             Pattern.CASE_INSENSITIVE + Pattern.DOTALL);
-
+    Firebase firebase;
     public WISPrLogin(Context context,WifiDesc wifiDesc){
         super(context,wifiDesc);
+        firebase=new Firebase(context);
     }
 
     @Override
@@ -99,6 +101,12 @@ public class WISPrLogin extends LoginHandler {
         else {
             showNotify("Login Type Error (WISPr)");
             Timber.d("Not supported WISPr.");
+        }
+        try {
+            firebase.LoginInfo(wifiDesc.getScriptName(), "", "success", "success","WISPr");
+            Timber.d("Firebase Success");
+        }catch (Exception e){
+            Timber.d("Firebase Error: "+e.toString());
         }
     }
 
