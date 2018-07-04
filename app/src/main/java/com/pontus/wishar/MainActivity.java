@@ -34,8 +34,7 @@ public class MainActivity extends AppCompatActivity {
     Toolbar toolbar;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
-    @BindView(R.id.fab)
-    FloatingActionButton fab;
+
     private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
@@ -45,13 +44,6 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-            }
-        });
 
         //The Ultimate JSON Library: JSON.simple vs GSON vs Jackson vs JSONP
         //http://blog.takipi.com/the-ultimate-json-library-json-simple-vs-gson-vs-jackson-vs-json/

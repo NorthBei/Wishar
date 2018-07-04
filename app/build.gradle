@@ -28,8 +28,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.google.firebase:firebase-core:15.0.0'
-    implementation 'com.google.firebase:firebase-crash:15.0.0'
+    implementation 'com.google.firebase:firebase-core:15.0.2'
+    implementation 'com.google.firebase:firebase-crash:15.0.2'
     implementation 'com.google.android.gms:play-services-maps:15.0.0'
     implementation "com.google.android.gms:play-services-location:15.0.0"
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
