@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "768626613137",
+    "firebase_url": "https://wishar-200316.firebaseio.com",
+    "project_id": "wishar-200316",
+    "storage_bucket": "wishar-200316.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:768626613137:android:e42aad799312df89",
+        "android_client_info": {
+          "package_name": "com.pontus.wishar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "768626613137-keukth5ilgvb2sfmh99ejce4b34r8nse.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pontus.wishar",
+            "certificate_hash": "484ed08c0726f40b680bfbb0f52047baccde803d"
+          }
+        },
+        {
+          "client_id": "768626613137-pdsrac0u1fj4vvqhu7ak5o2buscvobj7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pontus.wishar",
+            "certificate_hash": "971f06c4f6b53fbe8bec8d9f77166f8cdd413c76"
+          }
+        },
+        {
+          "client_id": "768626613137-f8b6ooo686h4gadfptqrg2q2mhjm40lt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCg5YQGRxNVoQxPYxz__vjYy63gC8I_43U"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "768626613137-f8b6ooo686h4gadfptqrg2q2mhjm40lt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
