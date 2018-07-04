@@ -1,13 +1,17 @@
 <resources>
     <string name="app_name">Wishar</string>
-    <string name="action_settings">Wi-Fi Map</string>
-    <string name="title_activity_debug">DebugActivity</string>
-
+    <string name="title_activity_maps">公共Wi-Fi地圖</string>
+    <!--menu-->
+    <string name="wifi_map">Wi-Fi Map</string>
+    <string name="select_wifi">Select WiFi</string>
+    <!--account dialog-->
     <string name="account_dialog_title"> 登入資訊</string>
     <string name="account_dialog_account_hint">帳號</string>
     <string name="account_dialog_password_hint">密碼</string>
     <string name="account_dialog_error">請輸入帳號或密碼</string>
-
+    <!--select wif dialog-->
+    <string name="select_wifi_dialog_title">請勾選要顯示的Wi-Fi</string>
+    <!--dialog button text-->
     <string name="dialog_check_btn">確定</string>
     <string name="dialog_cancel_btn">取消</string>
 
@@ -18,10 +22,9 @@
     <string name="emome">emome帳戶</string>
     <string name="hinet">Hinet帳戶</string>
 
-
     <string name="edit_dialog_spinner_hint">帳戶類型</string>
     <string name="edit_dialog_input_limit">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%+?\*_"'()-:</string>
-    <string name="title_activity_maps">Map</string>
 
+    <string name="google_maps_key">AIzaSyD3w0NvQ9-Su-dwQWLInvAsyrHaTV-VMxk</string>
 
 </resources>

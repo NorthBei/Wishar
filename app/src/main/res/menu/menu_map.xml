@@ -1,11 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.pontus.wishar.MainActivity">
+    tools:context="com.pontus.wishar.MapsActivity">
     <item
-        android:id="@+id/wifi_map"
+        android:id="@+id/select_wifi"
         android:orderInCategory="100"
-        android:title="@string/wifi_map"
-        app:showAsAction="never" />
+        android:title="@string/select_wifi"
+        android:icon="@drawable/ic_search_24dp"
+        app:showAsAction="always" />
 
 </menu>

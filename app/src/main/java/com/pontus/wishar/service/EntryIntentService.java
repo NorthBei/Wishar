@@ -85,7 +85,7 @@ public class EntryIntentService extends IntentService {
             String host = response.request().url().host();
             String reqUrl = response.request().url().toString();
             Timber.d("onHandleIntent: redirect url:%s",reqUrl);
-            if(wifiDesc.getRedirectPageHost().size()>0 && !wifiDesc.getRedirectPageHost().contains(host)){
+            if(wifiDesc.getRedirectPageHost() != null && wifiDesc.getRedirectPageHost().size()>0 && !wifiDesc.getRedirectPageHost().contains(host)){
                 notifyUser("WiFi供應商與熱點名稱不符，Wishar已停止");
                 return;
             }

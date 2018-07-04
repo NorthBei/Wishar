@@ -3,22 +3,18 @@ package com.pontus.wishar;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.pontus.wishar.map.MapController;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -29,12 +25,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        if(getSupportActionBar()!=null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-        getSupportActionBar().setTitle("公共Wi-Fi地圖");
 
         Intent intent = getIntent();
         Location location = intent.getParcelableExtra("location");
@@ -78,5 +74,50 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
       //get position
 
         googleMap.setMyLocationEnabled(true);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_map, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.select_wifi:
+                showSelectWifiDailog();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showSelectWifiDailog(){
+        String[] listItems = {"Hello", "World","A","B","C","D","E","F","G","H","I","J"};
+
+        new MaterialDialog.Builder(this)
+            .title(R.string.select_wifi_dialog_title)
+            .items(listItems)
+            .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+                @Override
+                public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
+                    //doc : https://github.com/afollestad/material-dialogs#multi-choice-list-dialogs
+                    /**
+                     * If you use alwaysCallMultiChoiceCallback(), which is discussed below,
+                     * returning false here won't allow the newly selected check box to actually be selected
+                     * (or the newly unselected check box to be unchecked).
+                     * See the limited multi choice dialog example in the sample project for details.
+                     **/
+                    return true;
+                }
+            })
+            .positiveText(R.string.dialog_check_btn)
+            .negativeText(R.string.dialog_cancel_btn)
+            .show();
     }
 }

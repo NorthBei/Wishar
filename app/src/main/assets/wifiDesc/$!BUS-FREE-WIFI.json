@@ -3,12 +3,13 @@
   "description":"國光客運",
   "protocol":"http",
   "domain":"lhefreewifi.eastasia.cloudapp.azure.com",
+  "redirectPageHost":["lhefreewifi.eastasia.cloudapp.azure.com"],
   "roamingSupport":[],
   "isNeedLogin":false,
   "type":"Parse",
   "parse":[
     {
-      "formSelector ":"#form1",
+      "formSelector":"#form1",
       "inputData":[]
     }
   ],
