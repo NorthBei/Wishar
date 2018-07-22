@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -16,16 +17,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.pontus.wishar.map.MapController;
+import com.pontus.wishar.storage.db.*;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private LocationCallback mLocationCallback;
     MapController mapcontroller;
     Double lat=25.052258,lng=121.544325;
+    String[] listItems = {"iTaiwan", "Starbucks","Tainan","TaipeiFree"};
+    Integer[] sellected =new Integer[listItems.length];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-
         if(getSupportActionBar()!=null) getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -37,8 +40,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (location != null) {
             lat=location.getLatitude();
             lng=location.getLongitude();
-
             //do something
+        }
+        for(int i=0;i<listItems.length;i++){
+            sellected[i]=i;
         }
 
     }
@@ -58,22 +63,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            Log.d("error","PermissionError");
             return;
         }
-
-        mapcontroller = new MapController(this, googleMap);
+        mapcontroller = new MapController(this, googleMap,listItems);
         String filename = "iTaiwan";
-        mapcontroller.controller("wifimap/" + filename + ".json", filename);//chose your file
-        mapcontroller.MoveMap(new LatLng(lat, lng), 15);//chose your location and map size
-      //get position
 
-        googleMap.setMyLocationEnabled(true);
+        //Log.d("latlng:",lat.toString()+"   "+lng.toString());
+        mapcontroller.MoveMap(new LatLng(lat, lng), 15);//chose your location and map size
+        mapcontroller.ShowArea(lat, lng,sellected);
+         googleMap.setMyLocationEnabled(true);
     }
 
     @Override
@@ -98,26 +97,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void showSelectWifiDailog(){
-        String[] listItems = {"Hello", "World","A","B","C","D","E","F","G","H","I","J"};
 
         new MaterialDialog.Builder(this)
             .title(R.string.select_wifi_dialog_title)
             .items(listItems)
-            .itemsCallbackMultiChoice(null, new MaterialDialog.ListCallbackMultiChoice() {
+            .itemsCallbackMultiChoice(sellected, new MaterialDialog.ListCallbackMultiChoice() {
+
                 @Override
                 public boolean onSelection(MaterialDialog dialog, Integer[] which, CharSequence[] text) {
-                    //doc : https://github.com/afollestad/material-dialogs#multi-choice-list-dialogs
-                    /**
-                     * If you use alwaysCallMultiChoiceCallback(), which is discussed below,
-                     * returning false here won't allow the newly selected check box to actually be selected
-                     * (or the newly unselected check box to be unchecked).
-                     * See the limited multi choice dialog example in the sample project for details.
-                     **/
+                        //doc : https://github.com/afollestad/material-dialogs#multi-choice-list-dialogs
+                    mapcontroller.ShowArea(lat,lng,which);
+                    sellected =which;
+                    Log.d("which: ", String.valueOf(which.length));
                     return true;
                 }
             })
-            .positiveText(R.string.dialog_check_btn)
-            .negativeText(R.string.dialog_cancel_btn)
-            .show();
+                .positiveText(R.string.dialog_check_btn)
+                .negativeText(R.string.dialog_cancel_btn)
+                .alwaysCallMultiChoiceCallback()
+                .show();
     }
 }
