@@ -2,7 +2,20 @@ package com.pontus.wishar.map;
 
 public class WifiData {
 
-    protected String name,lng,lat,addr;
+    public String name;
+    public String lng;
+    public String lat;
+    public String addr;
+    public String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
 
     public void setName(String name) {
         this.name = name;

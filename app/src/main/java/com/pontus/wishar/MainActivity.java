@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-
         //The Ultimate JSON Library: JSON.simple vs GSON vs Jackson vs JSONP
         //http://blog.takipi.com/the-ultimate-json-library-json-simple-vs-gson-vs-jackson-vs-json/
 
@@ -101,13 +100,15 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(intent);
                             }
                         }
+
                     });
 
-            startActivity(new Intent(this,MapsActivity.class));
+            //startActivity(new Intent(this,MapsActivity.class));
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }

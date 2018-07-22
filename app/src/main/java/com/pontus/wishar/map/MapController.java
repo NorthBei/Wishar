@@ -1,22 +1,19 @@
 package com.pontus.wishar.map;
 
 import android.content.Context;
-import android.location.Location;
-import android.os.Environment;
 import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
+import com.pontus.wishar.storage.db.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
+
+import ch.hsr.geohash.GeoHash;
 
 public class MapController {
 
@@ -24,51 +21,49 @@ public class MapController {
     private Context context;
     private GoogleMap mMap;
     WifiData[] wifiList;
+    WisharDB instance;
+    GeoHash geoHash;
+    Gson gson;
+    String[] listItems;
 
-    public MapController(Context context,GoogleMap googleMap){
+    public MapController(Context context, GoogleMap googleMap, String[] listItems) {
+        this.instance = WisharDB.getDB(context);
         this.context = context;
+        this.listItems = listItems;
         mMap = googleMap;
+        gson = new Gson();
+
     }
 
-    public String readFile(String fileName){
-        String fileContent = null;
-        try {
-            InputStream is = context.getAssets().open(fileName);
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
+    public void ShowArea(Double lat, Double lng, Integer[] sellected) {
+        mMap.clear();
+        geoHash = geoHash.withCharacterPrecision(lat, lng, 7);
+        Wifi[] wifidata;
+        int len = 6;
+        do {
+            wifidata = instance.mapDao().loadAreawifis(geoHash.toBase32().substring(0, len--) + "%");
+        } while (wifidata.length == 0 && len > 0);
 
-            fileContent = new String(buffer, FORMAT);
+        LatLng sydney;
+
+        for (int i = 0; i < wifidata.length; i++) {
+
+            WifiData[] wifilist = gson.fromJson(wifidata[i].WifiData, WifiData[].class);
+
+            for (int k = 0, j = 0; j < wifilist.length; j++) {
+                for(;k<sellected.length; k++) {
+                    if (listItems[sellected[k]].equals(wifilist[j].getType())) {
+                        sydney = new LatLng(Double.parseDouble(wifilist[j].getLat()), Double.parseDouble(wifilist[j].getLng()));
+                        mMap.addMarker(new MarkerOptions().position(sydney).title(wifilist[j].getType() + " " + wifilist[j].getName()).snippet(wifilist[j].getAddr()));
+                        break;
+                    }
+                }
+            }
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return fileContent;
     }
 
-    public <T> T  readJsonToObj(String fileName, Type type){
-        //1.maybe return null 2.just pass json filename , auto add .json at last
-        String data= readFile(fileName);
-        Log.d("data",data);
-        return new Gson().fromJson(data , type);
-    }
-
-    public void controller(String filename,String title){
-
-        wifiList=readJsonToObj(filename,WifiData[].class);
-        // Add a marker in Sydney and move the camera
-
-        LatLng sydney= new LatLng(Double.parseDouble(wifiList[0].getLat()), Double.parseDouble(wifiList[0].getLng()));
-        for(int i=1;i<wifiList.length;i++){
-            sydney = new LatLng(Double.parseDouble(wifiList[i].getLat()), Double.parseDouble(wifiList[i].getLng()));
-        mMap.addMarker(new MarkerOptions().position(sydney).title(title+" "+wifiList[i].getName()).snippet(wifiList[i].getAddr()));
-        }
-
+    public void MoveMap(LatLng position, int size) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((position), size));
 
     }
-    public void MoveMap(LatLng position,int size){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom((position),size));
-    }
-   }
+}

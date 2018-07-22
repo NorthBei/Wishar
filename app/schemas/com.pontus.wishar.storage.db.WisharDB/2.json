@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "fa99b6e22ce9d06fcb8fa1328b91b650",
+    "identityHash": "712c283e01bd8ec7d33f17e8dda0638d",
     "entities": [
       {
         "tableName": "DescCorr",
@@ -29,11 +29,37 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "WifiMap",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`HashId` TEXT NOT NULL, `WifiData` TEXT, PRIMARY KEY(`HashId`))",
+        "fields": [
+          {
+            "fieldPath": "HashId",
+            "columnName": "HashId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "WifiData",
+            "columnName": "WifiData",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "HashId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"fa99b6e22ce9d06fcb8fa1328b91b650\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"712c283e01bd8ec7d33f17e8dda0638d\")"
     ]
   }
 }

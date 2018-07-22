@@ -11,16 +11,24 @@ import com.pontus.wishar.data.DescCorr;
  * Created by NorthBei on 2018/3/25.
  */
 
-@Database(entities = {DescCorr.class}, version = 2)
+@Database(entities = {DescCorr.class,Wifi.class}, version = 2)
 public abstract  class WisharDB extends RoomDatabase {
     public abstract DescCorrDao descCorrespDao();
+    public abstract MapDao mapDao();
 
     private static WisharDB db;
 
+
     public synchronized static WisharDB getDB(Context context) {
-        if(db == null){
-            db = RoomAsset.databaseBuilder(context.getApplicationContext(), WisharDB.class, "wishar.db").allowMainThreadQueries().build();
+        if(db== null){
+            db= RoomAsset.databaseBuilder(context.getApplicationContext(), WisharDB.class, "wishar.db").allowMainThreadQueries().build();
         }
         return db;
     }
+
+
+
+
+
 }
+

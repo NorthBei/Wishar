@@ -25,7 +25,9 @@ public class WisharApp extends Application {
             Timber.plant(new FileLoggingTree(getApplicationContext()));
         }
         //init Wishar DB
-        WisharDB.getDB(getApplicationContext());
+        //only can initial one DB ,don't know whether lib promblem
+         WisharDB.getDB(getApplicationContext());
+
     }
 
     private void checkWifiResource(){
