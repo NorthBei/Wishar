@@ -45,6 +45,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    //EZ permission
+    implementation 'pub.devrel:easypermissions:1.2.0'
     //Room
     implementation 'android.arch.persistence.room:runtime:1.0.0'
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"

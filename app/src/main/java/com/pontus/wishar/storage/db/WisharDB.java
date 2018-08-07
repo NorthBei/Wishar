@@ -25,10 +25,5 @@ public abstract  class WisharDB extends RoomDatabase {
         }
         return db;
     }
-
-
-
-
-
 }
 
